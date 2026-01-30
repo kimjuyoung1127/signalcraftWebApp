@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 // Code Splitting: Lazy load pages for better performance
 const DashboardPage = lazy(() => import('./components/features/dashboard/DashboardPage').then(module => ({ default: module.DashboardPage })));
 const ReportPage = lazy(() => import('./components/features/reports/ReportPage').then(module => ({ default: module.ReportPage })));
+const MachinePage = lazy(() => import('./components/features/machines/MachinePage').then(module => ({ default: module.MachinePage })));
+const SettingsPage = lazy(() => import('./components/features/settings/SettingsPage').then(module => ({ default: module.SettingsPage })));
 const NotFoundPage = lazy(() => import('./components/shared/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
 
 // Loading Component
@@ -25,8 +27,8 @@ function App() {
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/report" element={<ReportPage />} />
-          <Route path="/machines" element={<NotFoundPage />} />
-          <Route path="/settings" element={<NotFoundPage />} />
+          <Route path="/machines" element={<MachinePage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
