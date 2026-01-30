@@ -8,23 +8,28 @@ interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 export function Badge({ children, className, variant = 'neutral', ...props }: BadgeProps) {
     const variants = {
-        success: 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800',
-        warning: 'bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800',
-        error: 'bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800',
-        info: 'bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800',
-        neutral: 'bg-slate-50 text-slate-700 border-slate-100 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700',
+        success: 'bg-emerald-50 text-emerald-600 border-emerald-100',
+        warning: 'bg-orange-50 text-orange-600 border-orange-100',
+        error: 'bg-red-50 text-red-600 border-red-100',
+        info: 'bg-blue-50 text-blue-600 border-blue-100',
+        neutral: 'bg-slate-50 text-slate-500 border-slate-100',
     };
 
     return (
         <span
             className={cn(
-                "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[11px] font-black border uppercase tracking-wider",
                 variants[variant],
                 className
             )}
             {...props}
         >
-            {variant === 'success' && <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+            {variant === 'success' && (
+                <span className="relative flex size-1.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                </span>
+            )}
             {children}
         </span>
     );

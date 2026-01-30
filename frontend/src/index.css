@@ -1,18 +1,40 @@
 @import "tailwindcss";
 
 @theme {
-  --color-signal-blue: #137fec;
-  --color-signal-mint: #a7f3d0;
-  --color-signal-orange: #fb923c;
-  --color-signal-red: #f87171;
+  /* Natural & Premium Color Palette */
+  --color-signal-blue: #3182f6;
+  /* Toss Blue */
+  --color-signal-blue-dim: #ecf4ff;
+  --color-signal-mint: #2ecc71;
+  /* Natural Green */
+  --color-signal-orange: #ff9500;
+  /* Apple Orange */
+  --color-signal-red: #ff3b30;
+  /* Natural Red */
 
-  --animate-fade-in: fadeIn 0.3s ease-out;
+  /* Neutral scale with subtle blue tint for harmony */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-900: #0f172a;
+
+  /* Premium Shadows */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.04);
+
+  /* Typography Harmony */
+  --font-pretendard: "Pretendard Variable", Pretendard, -apple-system, sans-serif;
+
+  /* Custom Animations & Transitions */
+  --animate-fade-in: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-pulse-slow: pulse 3s ease-in-out infinite;
+  --animate-bounce-subtle: bounceSubtle 2s ease-in-out infinite;
 
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(12px);
     }
 
     to {
@@ -20,21 +42,64 @@
       transform: translateY(0);
     }
   }
+
+  @keyframes bounceSubtle {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-4px);
+    }
+  }
 }
 
 @layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-pretendard);
+    /* Text Harmony: Tracking & Line Height */
+    letter-spacing: -0.02em;
+    line-height: 1.55;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply tracking-tight font-extrabold;
+    line-height: 1.25;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-md border border-white/20 shadow-sm rounded-2xl;
+    @apply bg-white/70 backdrop-blur-xl border border-white rounded-[2rem];
+    box-shadow: var(--shadow-glass);
   }
 
   .toss-button {
-    @apply px-5 py-3 rounded-2xl font-semibold transition-all duration-200 active:scale-95 disabled:opacity-50;
+    @apply px-6 py-4 rounded-[1.25rem] font-bold transition-all duration-300 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2;
   }
+
+  .section-label {
+    @apply text-slate-400 text-xs font-black uppercase tracking-[0.1em] mb-2 block;
+  }
+}
+
+/* Custom Scrollbar & Utilities */
+::-webkit-scrollbar {
+  width: 0px;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
