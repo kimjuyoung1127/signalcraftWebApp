@@ -65,6 +65,7 @@ export function MachinePage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState<FilterType>('all');
     const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
+    const [initialView, setInitialView] = useState<'analysis' | 'maintenance'>('analysis');
 
     const filteredMachines = useMemo(() => {
         return MOCK_MACHINES.filter(machine => {
@@ -75,6 +76,22 @@ export function MachinePage() {
             return matchesSearch && matchesFilter;
         });
     }, [searchTerm, filter]);
+
+    const handleCardClick = (machine: Machine) => {
+        setInitialView('analysis');
+        setSelectedMachine(machine);
+    };
+
+    const handleManage = (machine: Machine) => {
+        setInitialView('maintenance');
+        setSelectedMachine(machine);
+    };
+
+    const handleDelete = (id: string) => {
+        if (confirm('정말 이 설비를 삭제하시겠습니까?')) {
+            console.log('Delete machine:', id);
+        }
+    };
 
     return (
         <div className="flex flex-col min-h-screen pb-24 bg-slate-50">
@@ -115,7 +132,9 @@ export function MachinePage() {
                                     key={machine.id}
                                     machine={machine}
                                     index={idx}
-                                    onClick={setSelectedMachine}
+                                    onClick={handleCardClick}
+                                    onManage={handleManage}
+                                    onDelete={handleDelete}
                                 />
                             ))
                         ) : (
@@ -135,6 +154,7 @@ export function MachinePage() {
                 machine={selectedMachine}
                 isOpen={!!selectedMachine}
                 onClose={() => setSelectedMachine(null)}
+                initialView={initialView}
             />
 
             <BottomNav />

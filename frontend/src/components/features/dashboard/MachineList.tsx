@@ -37,6 +37,24 @@ const MOCK_MACHINES: Machine[] = [
 
 export function MachineList() {
     const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
+    const [initialView, setInitialView] = useState<'analysis' | 'maintenance'>('analysis');
+
+    const handleCardClick = (machine: Machine) => {
+        setInitialView('analysis');
+        setSelectedMachine(machine);
+    };
+
+    const handleManage = (machine: Machine) => {
+        setInitialView('maintenance');
+        setSelectedMachine(machine);
+    };
+
+    const handleDelete = (id: string) => {
+        if (confirm('정말 이 설비를 삭제하시겠습니까?')) {
+            console.log('Delete machine:', id);
+            // In a real app, you would call an API here
+        }
+    };
 
     return (
         <div className="px-4 space-y-4 pb-10">
@@ -51,7 +69,9 @@ export function MachineList() {
                         key={machine.id}
                         machine={machine}
                         index={idx}
-                        onClick={setSelectedMachine}
+                        onClick={handleCardClick}
+                        onManage={handleManage}
+                        onDelete={handleDelete}
                     />
                 ))}
             </div>
@@ -60,6 +80,7 @@ export function MachineList() {
                 machine={selectedMachine}
                 isOpen={!!selectedMachine}
                 onClose={() => setSelectedMachine(null)}
+                initialView={initialView}
             />
         </div>
     );

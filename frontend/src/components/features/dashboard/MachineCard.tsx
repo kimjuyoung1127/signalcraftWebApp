@@ -1,7 +1,8 @@
-import { MoreHorizontal, Brain, Zap, AlertTriangle, CalendarClock } from 'lucide-react';
+import { useState } from 'react';
+import { MoreHorizontal, Brain, Zap, AlertTriangle, CalendarClock, Trash2, Settings2 } from 'lucide-react';
 import { Card } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../../lib/utils';
 
 export interface Machine {
@@ -19,9 +20,13 @@ interface MachineCardProps {
     machine: Machine;
     index: number;
     onClick?: (machine: Machine) => void;
+    onManage?: (machine: Machine) => void;
+    onDelete?: (id: string) => void;
 }
 
-export function MachineCard({ machine, index, onClick }: MachineCardProps) {
+export function MachineCard({ machine, index, onClick, onManage, onDelete }: MachineCardProps) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
     const getStatusVariant = (status: Machine['status']) => {
         if (status === 'running') return 'success';
         if (status === 'warning') return 'warning';
@@ -41,10 +46,12 @@ export function MachineCard({ machine, index, onClick }: MachineCardProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, type: "spring", stiffness: 100, damping: 20 }}
-            className="px-4 py-2 cursor-pointer"
-            onClick={() => onClick?.(machine)}
+            className="px-4 py-2 cursor-pointer relative"
         >
-            <Card className="p-0 overflow-hidden border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 group">
+            <Card
+                className="p-0 overflow-hidden border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 group"
+                onClick={() => onClick?.(machine)}
+            >
                 <div className="p-6 flex gap-6">
                     <motion.div
                         whileHover={{ scale: 1.05 }}
@@ -62,9 +69,51 @@ export function MachineCard({ machine, index, onClick }: MachineCardProps) {
                                     {machine.location}
                                 </p>
                             </div>
-                            <button className="text-slate-300 p-2 hover:bg-slate-50 rounded-2xl transition-all active:scale-90">
-                                <MoreHorizontal size={20} />
-                            </button>
+                            <div className="relative">
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsMenuOpen(!isMenuOpen);
+                                    }}
+                                    className="text-slate-300 p-2 hover:bg-slate-50 rounded-2xl transition-all active:scale-90"
+                                >
+                                    <MoreHorizontal size={20} />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isMenuOpen && (
+                                        <motion.div
+                                            initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                                            className="absolute right-0 top-12 w-32 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden"
+                                        >
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onManage?.(machine);
+                                                    setIsMenuOpen(false);
+                                                }}
+                                                className="w-full px-4 py-2.5 flex items-center gap-2 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                                            >
+                                                <Settings2 size={16} />
+                                                관리
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    onDelete?.(machine.id);
+                                                    setIsMenuOpen(false);
+                                                }}
+                                                className="w-full px-4 py-2.5 flex items-center gap-2 text-sm font-bold text-rose-500 hover:bg-rose-50 transition-colors"
+                                            >
+                                                <Trash2 size={16} />
+                                                삭제
+                                            </button>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </div>
                         </div>
 
                         <div className="flex items-center gap-2.5 mt-auto">
