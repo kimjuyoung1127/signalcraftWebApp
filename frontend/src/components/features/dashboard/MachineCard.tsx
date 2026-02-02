@@ -18,9 +18,10 @@ export interface Machine {
 interface MachineCardProps {
     machine: Machine;
     index: number;
+    onClick?: (machine: Machine) => void;
 }
 
-export function MachineCard({ machine, index }: MachineCardProps) {
+export function MachineCard({ machine, index, onClick }: MachineCardProps) {
     const getStatusVariant = (status: Machine['status']) => {
         if (status === 'running') return 'success';
         if (status === 'warning') return 'warning';
@@ -40,7 +41,8 @@ export function MachineCard({ machine, index }: MachineCardProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1, type: "spring", stiffness: 100, damping: 20 }}
-            className="px-4 py-2"
+            className="px-4 py-2 cursor-pointer"
+            onClick={() => onClick?.(machine)}
         >
             <Card className="p-0 overflow-hidden border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 group">
                 <div className="p-6 flex gap-6">

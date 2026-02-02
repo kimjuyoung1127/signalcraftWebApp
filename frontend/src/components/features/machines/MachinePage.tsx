@@ -3,6 +3,7 @@ import { Search } from 'lucide-react';
 import { Header } from '../../shared/Header';
 import { BottomNav } from '../../shared/BottomNav';
 import { MachineCard, Machine } from '../dashboard/MachineCard';
+import { MachineDetailModal } from '../dashboard/MachineDetailModal';
 import { MachineFilters, FilterType } from './MachineFilters';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -15,7 +16,7 @@ const MOCK_MACHINES: Machine[] = [
         status: 'running',
         health: 98,
         prediction: '향후 7일간 특이사항 없음',
-        imageUrl: 'https://images.unsplash.com/photo-1578575437130-527eed3abbec?q=80&w=200&auto=format&fit=crop',
+        imageUrl: 'https://placehold.co/200x200?text=Freezer',
         type: 'Freezer'
     },
     {
@@ -25,7 +26,7 @@ const MOCK_MACHINES: Machine[] = [
         status: 'warning',
         health: 72,
         prediction: '베어링 마모 징후 (96% 확률)',
-        imageUrl: 'https://images.unsplash.com/photo-1542013936693-884638332954?q=80&w=200&auto=format&fit=crop',
+        imageUrl: 'https://placehold.co/200x200?text=Compressor',
         type: 'Compressor'
     },
     {
@@ -35,7 +36,7 @@ const MOCK_MACHINES: Machine[] = [
         status: 'running',
         health: 94,
         prediction: '효율 최적화 상태 유지 중',
-        imageUrl: 'https://images.unsplash.com/photo-1621905252507-b35492cc2575?q=80&w=200&auto=format&fit=crop',
+        imageUrl: 'https://placehold.co/200x200?text=HVAC',
         type: 'HVAC'
     },
     {
@@ -45,7 +46,7 @@ const MOCK_MACHINES: Machine[] = [
         status: 'error',
         health: 45,
         prediction: '모터 과열 위험 감지됨',
-        imageUrl: 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?q=80&w=200&auto=format&fit=crop',
+        imageUrl: 'https://placehold.co/200x200?text=Conveyor',
         type: 'Conveyor'
     },
     {
@@ -55,7 +56,7 @@ const MOCK_MACHINES: Machine[] = [
         status: 'running',
         health: 92,
         prediction: '정상 작동 중',
-        imageUrl: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=200&auto=format&fit=crop',
+        imageUrl: 'https://placehold.co/200x200?text=Press',
         type: 'Press'
     }
 ];
@@ -63,6 +64,7 @@ const MOCK_MACHINES: Machine[] = [
 export function MachinePage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState<FilterType>('all');
+    const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
 
     const filteredMachines = useMemo(() => {
         return MOCK_MACHINES.filter(machine => {
@@ -109,7 +111,12 @@ export function MachinePage() {
                     <AnimatePresence mode='popLayout'>
                         {filteredMachines.length > 0 ? (
                             filteredMachines.map((machine, idx) => (
-                                <MachineCard key={machine.id} machine={machine} index={idx} />
+                                <MachineCard
+                                    key={machine.id}
+                                    machine={machine}
+                                    index={idx}
+                                    onClick={setSelectedMachine}
+                                />
                             ))
                         ) : (
                             <motion.div
@@ -123,6 +130,12 @@ export function MachinePage() {
                     </AnimatePresence>
                 </div>
             </main>
+
+            <MachineDetailModal
+                machine={selectedMachine}
+                isOpen={!!selectedMachine}
+                onClose={() => setSelectedMachine(null)}
+            />
 
             <BottomNav />
         </div>
