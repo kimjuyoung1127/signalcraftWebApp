@@ -52,6 +52,12 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Acoustic Nuance**: AI 리포트 내의 '진동' 표현을 '소리'로 수정하여 제품 컨셉 일치도 강화
 - [x] **Weekly Trend Chart**: 최근 7일간의 기계 건강 변화를 시각화한 대시보드형 차트 도입
 
+## ✅ Phase 8: AI Insight Wrapped & UX Robustness (Latest)
+- [x] **AI Insight Card**: `AINote`를 인터랙티브한 카드형으로 개편하여 대시보드와 리포트 페이지의 일관성 확보
+- [x] **Multi-period Modal**: 일간, 주간, 월간 단위의 상세 분석을 제공하는 탭 구조의 AI 인사이트 모달 구현
+- [x] **Exception Handling**: 분석 데이터가 부족한 경우 사용자 가이드를 제공하는 예외 처리 화면 도입
+- [x] **Dashboard Entry**: 대시보드 히어로 섹션의 실시간 상태 표시를 클릭 가능한 버튼으로 전환하여 접근성 강화
+
 ## 🚀 Future Roadmap (Pending)
 - [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
 - [ ] **Backend Integration**: FastAPI 기반 API 서버 및 실시간 WebSocket 연동
@@ -60,4 +66,4 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
 
 ---
-*마지막 업데이트: 2026-02-02 (11:32 AM)*
+*마지막 업데이트: 2026-02-02 (03:04 PM)*

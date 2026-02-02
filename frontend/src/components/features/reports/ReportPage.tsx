@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { StatRow } from './StatRow';
-import { AINote } from './AINote';
+import { AIInsightCard } from './AIInsightCard';
 import { HistoryView } from './HistoryView';
 import { ShareModal } from './ShareModal';
 import { CheckCircle2, ChevronDown, History, Share2, TrendingUp, Zap } from 'lucide-react';
@@ -161,7 +161,7 @@ export function ReportPage() {
                                 </div>
                             </section>
 
-                            <AINote />
+                            <AIInsightCard />
                         </motion.div>
                     ) : (
                         <HistoryView onSelectDate={(date) => {
