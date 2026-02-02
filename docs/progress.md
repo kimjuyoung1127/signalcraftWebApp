@@ -32,11 +32,19 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Alias 설정**: `@/` 경로 별칭을 통한 클린 코드 구조 확보
 - [x] **Interaction**: `framer-motion`을 활용한 고급 스프링 애니메이션 및 트랜지션 적용
 
+## ✅ Phase 5: Advanced AI & Spec Implementation (Completed)
+- [x] **Spec Alignment**: 대표님 명세서 기반 '자산 요약' 및 '스마트 일지' 기획 완료
+- [x] **Schema Expansion**: EHI, GP Forecast, HACCP 로그 지원을 위한 DB 스키마 업데이트
+- [x] **EHI Visualization**: 0.1초 만에 파악 가능한 대형 게이지 및 맥박(Pulse) 애니메이션 구현
+- [x] **Forecasting Engine**: GP 기반 72시간 고장 예보 그래프 및 골든타임 UI
+- [x] **HACCP Smart Log**: 1분 단위 이벤트 타임라인 및 가상 센서 리포트
+- [x] **Multi-site Map**: 다중 매장 관리를 위한 위치 기반 상태 핀(Map View) & 사이트 헬스 랭킹
+
 ## 🚀 Future Roadmap (Pending)
-- [ ] **Backend Integration**: FastAPI 기반 API 서버 연동
-- [ ] **Real-time Data**: Supabase/Socket을 이용한 실시간 설비 데이터 스트리밍
+- [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
+- [ ] **Backend Integration**: FastAPI 기반 API 서버 및 실시간 WebSocket 연동
 - [ ] **PWA Manifest**: 오프라인 모드 및 설치 가능한 앱 환경 구성
-- [ ] **AI Model Serving**: 실제 진동/소음 데이터 기반의 이상 탐지 알고리즘 연결
+- [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
 
 ---
 *마지막 업데이트: 2026-01-30*

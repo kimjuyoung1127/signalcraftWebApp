@@ -70,6 +70,7 @@ erDiagram
 | `model_type` | `text` | 설비 유형 | 'FREEZER', 'HVAC' 등 |
 | `status` | `text` | 현재 상태 (UI 표시용) | 'GOOD', 'WARNING', 'DANGER' |
 | `config` | `jsonb` | **[핵심] AI 및 기기 설정값** | 예: `{"algo_ver": "5.7", "thresholds": {"60hz": 1.2}}` |
+| `location_info` | `jsonb` | 지리 정보 (Multi-site용) | 예: `{"lat": 37.5, "lng": 127.0, "address": "..."}` |
 | `last_seen_at` | `timestamptz` | 마지막 통신 시각 | 오프라인 감지용 |
 | `created_at` | `timestamptz` | 등록일 | |
 
@@ -87,6 +88,7 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 | `id` | `bigint` (PK) | 자동 증가 ID | 대용량 데이터 최적화 |
 | `device_id` | `uuid` (FK) | 기기 ID | `ON DELETE CASCADE` |
 | `features` | `jsonb` | **[핵심] 주파수별 특징 데이터** | 예: `{"60hz": 0.5, "120hz": 0.2, "temp": -18}` |
+| `state_token` | `text` | 가동 모드 [ON, OFF, STR, UNL, DEF] | Pulse Status용 |
 | `is_machine_on` | `bool` | 가동 여부 (SoundLab 알고리즘 결과) | 리포트 통계용 |
 | `captured_at` | `timestamptz` | 데이터 수집 시각 | |
 
@@ -118,8 +120,11 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 | `device_id` | `uuid` (PK) | 기기 ID | 복합 PK |
 | `total_runtime`| `int` | 총 가동 시간 (초) | |
 | `cycle_count` | `int` | ON/OFF 횟수 | |
-| `health_score` | `int` | 일간 건강 점수 (0-100) | |
-| `ai_summary` | `text` | AI 한 줄 평 | 예: "어제보다 무리가 덜 갔어요." |
+| `health_score` | `int` | 일간 건강 점수 (EHI: 0-100) | |
+| `roi_data` | `jsonb` | **[Virtual ROI] 경제적 가치** | 예: `{"watt": 45.2, "door_opens": 12}` |
+| `diagnostics` | `jsonb` | **[핵심] 부품별 시멘틱 분석** | 예: `{"comp": 95, "fan": 88, "valve": 92}` |
+| `ai_summary` | `text` | AI 한 줄 평 (Reasoning Log) | |
+| `haccp_status` | `text` | HACCP 준수 여부 (PASS/FAIL) | |
 | `created_at` | `timestamptz` | 생성 시각 | |
 
 #### `maintenance_logs` (유지보수 이력) - **New for Action**
@@ -147,6 +152,30 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 | `technician_info`| `jsonb` | 배정된 기사 정보 | 예: `{"name": "김기사", "phone": "010-..."}` |
 | `scheduled_at` | `timestamptz` | 방문 예정 시간 | |
 | `resolved_at` | `timestamptz` | 해결 완료 시간 | |
+
+#### 5️⃣ Advanced Analytics (고급 분석) - **New for Spec**
+
+#### `machine_event_logs` (1분 단위 정밀 로그)
+HACCP 법적 증빙을 위한 상세 이벤트 타임라인입니다.
+
+| Column | Type | Description | Note |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` (PK) | | |
+| `device_id` | `uuid` (FK) | | |
+| `event_type` | `text` | 'ON', 'OFF', 'DEF', 'DOOR' | |
+| `status` | `text` | '정상', '주의', '절전' | |
+| `details` | `text` | 비고 (예: "15분 가동 완료") | |
+| `occurred_at` | `timestamptz` | 발생 시각 | |
+
+#### `forecasts` (고장 예보 엔진)
+가우시안 프로세스(GP) 기반의 미래 예측 데이터입니다.
+
+| Column | Type | Description | Note |
+| :--- | :--- | :--- | :--- |
+| `device_id` | `uuid` (PK, FK) | | |
+| `prediction_data` | `jsonb` | 미래 3일간의 Mean/Uncertainty 배열 | |
+| `golden_time` | `timestamptz` | 고장 임계치 도달 예상 시점 | 카운트다운용 |
+| `updated_at` | `timestamptz` | 모델 갱신 시각 | |
 
 ---
 
