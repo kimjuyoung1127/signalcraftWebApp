@@ -40,11 +40,24 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **HACCP Smart Log**: 1분 단위 이벤트 타임라인 및 가상 센서 리포트
 - [x] **Multi-site Map**: 다중 매장 관리를 위한 위치 기반 상태 핀(Map View) & 사이트 헬스 랭킹
 
+## ✅ Phase 6: User Accessibility & Mobile Enhancement (Latest)
+- [x] **Layman's Terms**: 전문 기술 용어(압축기, 제상 등)를 일반 사용자도 즉시 이해 가능한 단어(엔진, 성에 제거 등)로 순화
+- [x] **Line-break Optimization**: 한글 문장이 모바일에서 어색하게 끊기지 않도록 `break-keep` 최적화
+- [x] **Intuitive Visualization**: 건강 상태(Health)에 따라 색상이 실시간으로 변하는 '기계 소음 스펙트럼' 구현
+- [x] **Simplified Forecasting**: 기술적 수치 정보를 '내일', '모레' 등 일상 언어로 단순화하여 직관성 극대화
+
+## ✅ Phase 7: Advanced Reporting & Sharing (Latest)
+- [x] **Report History**: 과거 리포트 목록을 조회하고 빠르게 다시 볼 수 있는 '히스토리 뷰' 구현
+- [x] **Smart Sharing**: 리포트를 카카오톡, PDF, 이미지 등으로 즉시 공유할 수 있는 '공유하기 모달' 추가
+- [x] **Acoustic Nuance**: AI 리포트 내의 '진동' 표현을 '소리'로 수정하여 제품 컨셉 일치도 강화
+- [x] **Weekly Trend Chart**: 최근 7일간의 기계 건강 변화를 시각화한 대시보드형 차트 도입
+
 ## 🚀 Future Roadmap (Pending)
 - [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
 - [ ] **Backend Integration**: FastAPI 기반 API 서버 및 실시간 WebSocket 연동
+- [ ] **Dark Mode Support**: 눈이 편안한 저조도 환경을 위한 전역 다크 모드 테마 구현 (구현 예정)
 - [ ] **PWA Manifest**: 오프라인 모드 및 설치 가능한 앱 환경 구성
 - [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
 
 ---
-*마지막 업데이트: 2026-01-30*
+*마지막 업데이트: 2026-02-02 (11:32 AM)*

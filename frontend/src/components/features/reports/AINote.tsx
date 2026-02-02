@@ -14,7 +14,7 @@ export function AINote() {
                     <h3 className="text-xs font-black uppercase tracking-widest">SignalCraft AI Note</h3>
                 </div>
                 <p className="text-[15px] leading-relaxed text-slate-700 font-bold">
-                    "새벽 <span className="text-slate-900 font-extrabold underline decoration-blue-200 decoration-4">오전 3:00</span>경, 일시적으로 큰 진동이 감지되었으나 곧 안정화되었습니다. 현재 조치가 필요한 사항은 없습니다."
+                    "새벽 <span className="text-slate-900 font-extrabold underline decoration-blue-200 decoration-4">오전 3:00</span>경, 일시적으로 큰 소리가 감지되었으나 곧 안정화되었습니다. 현재 조치가 필요한 사항은 없습니다."
                 </p>
             </div>
         </motion.div>

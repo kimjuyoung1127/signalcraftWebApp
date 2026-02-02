@@ -52,9 +52,9 @@ export function MaintenanceTab({
                                         <AlertCircle size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-black text-slate-900 leading-tight mb-1">점검이 필요해 보여요</h3>
-                                        <p className="text-sm text-slate-500 font-bold leading-relaxed">
-                                            마지막 필터 청소 이후 <span className="text-amber-600">32일</span>이 경과했습니다. 현재 기기 소음 패턴에서 미세한 가열 징후가 감지됩니다.
+                                        <h3 className="text-lg font-black text-slate-900 leading-tight mb-1 break-keep">점검이 필요해 보여요</h3>
+                                        <p className="text-sm text-slate-500 font-bold leading-relaxed break-keep">
+                                            마지막 청소 이후 <span className="text-amber-600">32일</span>이 지났습니다. 기계 소리가 평소와 달라 점검을 권장합니다.
                                         </p>
                                     </div>
                                 </div>
@@ -76,9 +76,9 @@ export function MaintenanceTab({
 
                             <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-100">
                                 {[
-                                    { date: '2026. 01. 15', action: '필터 물세척 및 성에 제거', type: 'CLEANING', provider: '사장님' },
-                                    { date: '2025. 12. 01', action: '정기 점검 및 가스 충전', type: 'CHECK', provider: '나이스 냉동' },
-                                    { date: '2025. 11. 15', action: '도어 개스킷 교체', type: 'PART_REPLACE', provider: '사장님' },
+                                    { date: '2026. 01. 15', action: '필터 청소 및 성에 제거', type: 'CLEANING', provider: '사장님' },
+                                    { date: '2025. 12. 01', action: '정기 점검 및 가스 보충', type: 'CHECK', provider: '서비스 센터' },
+                                    { date: '2025. 11. 15', action: '문 고무 패킹 교체', type: 'PART_REPLACE', provider: '사장님' },
                                 ].map((log, i) => (
                                     <div key={i} className="relative flex items-start gap-6 pl-2">
                                         <div className="mt-1.5 size-6 shrink-0 rounded-full border-4 border-white bg-signal-blue shadow-sm z-10" />
@@ -106,8 +106,8 @@ export function MaintenanceTab({
                                         <Settings2 size={24} className="text-signal-blue" />
                                     </div>
                                     <div>
-                                        <h4 className="font-black text-lg">전문 기사님이 필요하신가요?</h4>
-                                        <p className="text-xs text-slate-400 font-bold">SignalCraft 전문 수리팀이 대기 중입니다</p>
+                                        <h4 className="font-black text-lg break-keep">수리 전문가의 도움이 필요하신가요?</h4>
+                                        <p className="text-xs text-slate-400 font-bold break-keep">기사님이 방문하여 꼼꼼하게 점검해 드립니다</p>
                                     </div>
                                 </div>
                                 <Button
@@ -139,12 +139,12 @@ export function MaintenanceTab({
 
                         <form onSubmit={onSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <label className="text-sm font-black text-slate-700">고장 증상 및 요청사항</label>
+                                <label className="text-sm font-black text-slate-700">어디가 불편하신가요?</label>
                                 <textarea
                                     value={symptom}
                                     onChange={(e) => setSymptom(e.target.value)}
-                                    className="w-full h-32 p-4 rounded-2xl bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-signal-blue/20 focus:border-signal-blue text-sm font-bold text-slate-600 resize-none"
-                                    placeholder="구체적인 증상을 적어주세요."
+                                    className="w-full h-32 p-4 rounded-2xl bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-signal-blue/20 focus:border-signal-blue text-sm font-bold text-slate-600 resize-none break-keep"
+                                    placeholder="기계 소리가 크거나 시원하지 않은 등 증상을 적어주세요."
                                 />
                             </div>
 

@@ -147,6 +147,7 @@
 | **Phase 2** | **Reporting Engine** | 일간 리포트 생성 로직 구현(배치), 알림 트리거 개발 | 1주 |
 | **Phase 3** | **Frontend (MVP)** | React PWA 구축, 대시보드/리포트 UI 구현, FCM 연동 | 2주 |
 | **Phase 4** | **Test & Tuning** | 실환경 테스트, 자동 임계값 튜닝 검증, "학습 모드" UX 개선 | 1주 |
+| **Phase 5** | **Advanced UX** | 다크 모드(Dark Mode) 지원 및 테마 최적화 | 1주 |
 
 ---
 

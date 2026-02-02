@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface ReportHeaderProps {
     title: string;
+    onShare?: () => void;
 }
 
-export function ReportHeader({ title }: ReportHeaderProps) {
+export function ReportHeader({ title, onShare }: ReportHeaderProps) {
     const navigate = useNavigate();
 
     return (
@@ -17,7 +18,10 @@ export function ReportHeader({ title }: ReportHeaderProps) {
                 <ChevronLeft size={24} />
             </button>
             <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">{title}</h2>
-            <button className="p-2 rounded-xl hover:bg-slate-50 text-signal-blue transition-colors active:scale-95">
+            <button
+                onClick={onShare}
+                className="p-2 rounded-xl hover:bg-slate-50 text-signal-blue transition-colors active:scale-95"
+            >
                 <Share2 size={24} />
             </button>
         </header>
