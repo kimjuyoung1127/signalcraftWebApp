@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { ReportHeader } from './ReportHeader';
 import { StatRow } from './StatRow';
 import { AINote } from './AINote';
 import { HistoryView } from './HistoryView';
@@ -8,6 +7,8 @@ import { CheckCircle2, ChevronDown, History, Share2, TrendingUp, Zap } from 'luc
 import { Button } from '../../ui/Button';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, Tooltip, ResponsiveContainer } from 'recharts';
+import { BottomNav } from '../../shared/BottomNav';
+import { Header } from '../../shared/Header';
 
 type ViewMode = 'report' | 'history';
 
@@ -27,13 +28,22 @@ export function ReportPage() {
     ];
 
     return (
-        <div className="flex flex-col min-h-screen bg-white">
-            <ReportHeader
-                title={viewMode === 'report' ? "일간 건강 리포트" : "리포트 히스토리"}
-                onShare={() => setIsShareOpen(true)}
-            />
+        <div className="flex flex-col min-h-screen pb-24 bg-slate-50">
+            <Header />
 
-            <main className="flex-1 p-5 space-y-8 pb-20 overflow-x-hidden">
+            <main className="flex-1 overflow-y-auto px-5 pt-6 space-y-8">
+                <div className="flex items-center justify-between px-1">
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+                        {viewMode === 'report' ? "오늘의 리포트" : "히스토리"}
+                    </h2>
+                    <button
+                        onClick={() => setIsShareOpen(true)}
+                        className="p-3 rounded-2xl bg-white border border-slate-100 shadow-sm text-signal-blue active:scale-90 transition-all font-bold"
+                    >
+                        <Share2 size={20} />
+                    </button>
+                </div>
+
                 <AnimatePresence mode="wait">
                     {viewMode === 'report' ? (
                         <motion.div
@@ -53,7 +63,7 @@ export function ReportPage() {
                                     <span className="text-sm text-slate-300 font-bold mb-1">2026</span>
                                 </div>
 
-                                <button className="flex items-center gap-2 rounded-2xl bg-slate-50 px-5 py-3 border border-slate-100 active:scale-95 transition-all">
+                                <button className="flex items-center gap-2 rounded-2xl bg-white px-5 py-3 border border-slate-100 active:scale-95 transition-all shadow-sm">
                                     <span className="text-signal-blue font-bold">워크인 냉동고 A</span>
                                     <ChevronDown size={18} className="text-slate-400" />
                                 </button>
@@ -61,8 +71,8 @@ export function ReportPage() {
 
                             {/* Weekly Trend Chart */}
                             <section className="space-y-4">
-                                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
-                                    <TrendingUp size={20} className="text-signal-blue" />
+                                <h3 className="section-label flex items-center gap-2">
+                                    <TrendingUp size={18} className="text-signal-blue" />
                                     주간 건강 트렌드
                                 </h3>
                                 <div className="h-48 w-full p-4 bg-white border border-slate-100 rounded-[2rem] shadow-sm">
@@ -111,7 +121,7 @@ export function ReportPage() {
                             </motion.div>
 
                             {/* Energy Insight Card */}
-                            <section className="p-6 rounded-[2rem] bg-slate-900 text-white relative overflow-hidden">
+                            <section className="p-6 rounded-[2rem] bg-slate-900 text-white relative overflow-hidden shadow-xl shadow-slate-200">
                                 <div className="absolute -right-4 -top-4 opacity-10">
                                     <Zap size={100} />
                                 </div>
@@ -129,7 +139,7 @@ export function ReportPage() {
 
                             {/* Statistics Section */}
                             <section className="space-y-4">
-                                <h3 className="text-lg font-black text-slate-900 flex items-center gap-2">
+                                <h3 className="section-label flex items-center gap-2">
                                     <div className="size-2 bg-signal-blue rounded-full" />
                                     핵심 통계
                                 </h3>
@@ -162,7 +172,7 @@ export function ReportPage() {
                 </AnimatePresence>
 
                 {/* Footer Actions */}
-                <div className="flex gap-3 pt-4 sticky bottom-5 z-30">
+                <div className="flex gap-3 pt-4 sticky bottom-5 z-30 pb-4">
                     <Button
                         variant="secondary"
                         onClick={() => setViewMode(viewMode === 'report' ? 'history' : 'report')}
@@ -196,6 +206,8 @@ export function ReportPage() {
                 onClose={() => setIsShareOpen(false)}
                 reportDate={selectedDate}
             />
+
+            <BottomNav />
         </div>
     );
 }

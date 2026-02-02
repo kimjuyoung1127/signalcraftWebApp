@@ -45,32 +45,42 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4, transition: { duration: 0.2 } }}
+            whileTap={{ scale: 0.98 }}
             transition={{ delay: index * 0.1, type: "spring", stiffness: 100, damping: 20 }}
             className="px-4 py-2 cursor-pointer relative"
         >
             <Card
-                className="p-0 overflow-hidden border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 group"
+                className="p-0 overflow-hidden border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 group relative"
                 onClick={() => onClick?.(machine)}
             >
-                <div className="p-6 flex gap-6">
+                {/* Background Sparkle Effect on Hover */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-signal-blue/0 via-signal-blue/[0.02] to-signal-blue/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                <div className="p-6 flex gap-6 relative z-10">
                     <motion.div
-                        whileHover={{ scale: 1.05 }}
-                        className="w-24 h-24 shrink-0 bg-slate-100 rounded-[1.5rem] bg-center bg-cover border border-slate-50 overflow-hidden"
+                        whileHover={{ scale: 1.1, rotate: -2 }}
+                        className="w-24 h-24 shrink-0 bg-slate-100 rounded-[1.5rem] bg-center bg-cover border border-slate-50 overflow-hidden shadow-sm"
                         style={{ backgroundImage: `url(${machine.imageUrl})` }}
                     />
 
                     <div className="flex flex-col flex-1">
                         <div className="flex justify-between items-start mb-2">
                             <div>
-                                <h4 className="text-[17px] font-black text-slate-900 leading-tight tracking-tight mb-0.5 group-hover:text-signal-blue transition-colors">
+                                <motion.h4
+                                    layout
+                                    className="text-[17px] font-black text-slate-900 leading-tight tracking-tight mb-0.5 group-hover:text-signal-blue transition-colors"
+                                >
                                     {machine.name}
-                                </h4>
+                                </motion.h4>
                                 <p className="text-[13px] text-slate-400 font-bold tracking-tight">
                                     {machine.location}
                                 </p>
                             </div>
                             <div className="relative">
-                                <button
+                                <motion.button
+                                    whileHover={{ scale: 1.1, backgroundColor: '#f8fafc' }}
+                                    whileTap={{ scale: 0.9 }}
                                     onClick={(e) => {
                                         e.stopPropagation();
                                         setIsMenuOpen(!isMenuOpen);
@@ -78,14 +88,14 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                                     className="text-slate-300 p-2 hover:bg-slate-50 rounded-2xl transition-all active:scale-90"
                                 >
                                     <MoreHorizontal size={20} />
-                                </button>
+                                </motion.button>
 
                                 <AnimatePresence>
                                     {isMenuOpen && (
                                         <motion.div
-                                            initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                                            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                                            initial={{ opacity: 0, scale: 0.9, y: -10, filter: "blur(4px)" }}
+                                            animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)" }}
+                                            exit={{ opacity: 0, scale: 0.9, y: -10, filter: "blur(4px)" }}
                                             className="absolute right-0 top-12 w-32 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 overflow-hidden"
                                         >
                                             <button
@@ -117,11 +127,25 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                         </div>
 
                         <div className="flex items-center gap-2.5 mt-auto">
-                            <Badge variant={getStatusVariant(machine.status)}>
-                                {getStatusLabel(machine.status)}
-                            </Badge>
+                            <motion.div
+                                animate={machine.status === 'running' ? {
+                                    scale: [1, 1.05, 1],
+                                    opacity: [1, 0.9, 1]
+                                } : {}}
+                                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                            >
+                                <Badge variant={getStatusVariant(machine.status)}>
+                                    {getStatusLabel(machine.status)}
+                                </Badge>
+                            </motion.div>
 
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100">
+                            <motion.div
+                                animate={machine.health > 90 ? {
+                                    boxShadow: ["0 0 0px rgba(16, 185, 129, 0)", "0 0 12px rgba(16, 185, 129, 0.2)", "0 0 0px rgba(16, 185, 129, 0)"]
+                                } : {}}
+                                transition={{ repeat: Infinity, duration: 4 }}
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 rounded-full border border-slate-100"
+                            >
                                 <Zap className={cn(
                                     "size-3.5",
                                     machine.health > 90 ? "text-signal-mint fill-signal-mint/20" : "text-signal-orange fill-signal-orange/20"
@@ -129,15 +153,19 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                                 <span className="text-[12px] font-black text-slate-600">
                                     {machine.health}%
                                 </span>
-                            </div>
+                            </motion.div>
                         </div>
                     </div>
                 </div>
 
-                <div className={cn(
-                    "px-6 py-4 flex items-center gap-3 transition-all border-t border-slate-50",
-                    machine.status === 'warning' ? "bg-signal-red/5 text-signal-red" : "bg-slate-50/50 text-slate-600"
-                )}>
+                <motion.div
+                    initial={false}
+                    animate={{ backgroundColor: machine.status === 'warning' ? "rgba(239, 68, 68, 0.05)" : "rgba(248, 250, 252, 0.5)" }}
+                    className={cn(
+                        "px-6 py-4 flex items-center gap-3 transition-all border-t border-slate-50",
+                        machine.status === 'warning' ? "text-signal-red" : "text-slate-600"
+                    )}
+                >
                     <div className={cn(
                         "p-2 rounded-xl backdrop-blur-sm",
                         machine.status === 'warning' ? "bg-signal-red/10" : "bg-signal-blue/10"
@@ -150,7 +178,7 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                     <p className="text-[13px] font-bold tracking-tight leading-snug">
                         {machine.prediction}
                     </p>
-                </div>
+                </motion.div>
             </Card>
         </motion.div>
     );
