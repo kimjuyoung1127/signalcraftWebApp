@@ -52,18 +52,24 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Acoustic Nuance**: AI 리포트 내의 '진동' 표현을 '소리'로 수정하여 제품 컨셉 일치도 강화
 - [x] **Weekly Trend Chart**: 최근 7일간의 기계 건강 변화를 시각화한 대시보드형 차트 도입
 
-## ✅ Phase 8: AI Insight Wrapped & UX Robustness (Latest)
-- [x] **AI Insight Card**: `AINote`를 인터랙티브한 카드형으로 개편하여 대시보드와 리포트 페이지의 일관성 확보
-- [x] **Multi-period Modal**: 일간, 주간, 월간 단위의 상세 분석을 제공하는 탭 구조의 AI 인사이트 모달 구현
-- [x] **Exception Handling**: 분석 데이터가 부족한 경우 사용자 가이드를 제공하는 예외 처리 화면 도입
-- [x] **Dashboard Entry**: 대시보드 히어로 섹션의 실시간 상태 표시를 클릭 가능한 버튼으로 전환하여 접근성 강화
+## ✅ Phase 9: Advanced Performance Optimization (Best Practices)
+- [x] **named-chunks**: 라우트별 `viteChunkName` 적용으로 디버깅 및 네트워크 로그 가독성 향상
+- [x] **Terser Optimization**: 프로덕션 빌드 시 `console.log` 및 `debugger` 자동 제거 설정
+- [x] **Bundle Visualizer**: `rollup-plugin-visualizer` 도입으로 번들 사이즈 정밀 분석 및 시각화
+- [x] **Type-safe Env**: `ImportMetaEnv` 인터페이스 정의를 통한 환경 변수 타입 안정성 확보
+
+## ✅ Phase 10: Backend Structural Foundation (Mirroring)
+- [x] **1:1 Granular Mapping**: 프론트엔드 기능 구조와 1:1로 대응되는 `app/features/` 디렉토리 설계
+- [x] **Main Sub-module**: `machine_detail` 내 `analysis`, `maintenance`, `smart_log` 백엔드 파일 분리
+- [x] **Feature Routers**: 각 기능별 독립적인 FastAPI 라우터 구성 및 중앙 집중식 등록 (`app/main.py`)
+- [x] **Core Config**: Pydantic Settings 기반의 중앙 설정 관리 체계 구축
 
 ## 🚀 Future Roadmap (Pending)
 - [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
-- [ ] **Backend Integration**: FastAPI 기반 API 서버 및 실시간 WebSocket 연동
+- [/] **Backend Logic Implementation**: 분리된 각 기능별 비즈니스 로직 및 Supabase 연동 구현
 - [ ] **Dark Mode Support**: 눈이 편안한 저조도 환경을 위한 전역 다크 모드 테마 구현 (구현 예정)
 - [ ] **PWA Manifest**: 오프라인 모드 및 설치 가능한 앱 환경 구성
 - [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
 
 ---
-*마지막 업데이트: 2026-02-02 (03:04 PM)*
+*마지막 업데이트: 2026-02-03 (09:55 AM)*
