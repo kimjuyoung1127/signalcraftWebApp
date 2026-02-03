@@ -64,6 +64,22 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Feature Routers**: 각 기능별 독립적인 FastAPI 라우터 구성 및 중앙 집중식 등록 (`app/main.py`)
 - [x] **Core Config**: Pydantic Settings 기반의 중앙 설정 관리 체계 구축
 
+## ✅ Phase 11: PWA Foundation & Install UI
+- [x] **Installable Web App**: `vite-plugin-pwa` 도입으로 브라우저 내 '앱 설치' 기능 활성화
+- [x] **Custom Install Button**: 헤더 내 '앱 설치' 버튼 구현 (이미 설치된 경우 또는 앱 모드 작동 시 자동 숨김)
+- [x] **iOS Compatibility**: 아이폰 사용자를 위한 '홈 화면에 추가' 안내 팝업 및 플랫폼 감지 로직 적용
+- [x] **Premium Asset**: 192px/512px 고화질 앱 아이콘 세트 생성 및 매니페스트 연동
+- [x] **Dev Mode Ready**: 개발 환경(`localhost`)에서도 설치 기능을 테스트할 수 있는 `devOptions` 설정
+
+## ✅ Phase 12: Database V2 & Data Migration
+- [x] **Schema V2 Application**: 정규화된 5개 핵심 테이블(`devices`, `telemetry_logs` 등) 생성 및 인덱스 최적화
+- [x] **Super Account**: 디버깅 및 초기 개발을 위한 슈퍼 계정(`admin@signalcraft.com`) 생성
+- [x] **Legacy Migration**: 기존 `sound_logs` 데이터(1,456건)를 V2 스키마로 성공적으로 이관 및 무결성 검증
+
+## ✅ Phase 13: Vertical Slice (Settings & Profile)
+- [x] **Profile Integration**: `ProfileCard.tsx`에서 실제 Supabase 계정 정보 및 연결 기기 수(5대) 표시 구현
+- [x] **Account Logic**: 1개의 슈퍼 계정에 5개의 기기가 연결된 1:N 구조 데이터 흐름 검증
+
 ## 🚀 Future Roadmap (Pending)
 - [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
 - [/] **Backend Logic Implementation**: 분리된 각 기능별 비즈니스 로직 및 Supabase 연동 구현
@@ -72,4 +88,4 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
 
 ---
-*마지막 업데이트: 2026-02-03 (09:55 AM)*
+*마지막 업데이트: 2026-02-03 (12:02 PM)*

@@ -1,4 +1,4 @@
-# SignalCraft Biz Database Schema (Extended V2)
+# SignalCraft Biz Database Schema (Final V2)
 
 SignalCraft Biz의 핵심 가치인 **"Zero Config"**, **"Actionable Insight"**, **"Scalability"**를 지원하기 위한 확장형 Supabase(PostgreSQL) 스키마입니다.
 
@@ -23,6 +23,8 @@ erDiagram
     devices ||--o{ incidents : triggers
     devices ||--o{ service_tickets : requests
     devices ||--o{ maintenance_logs : records
+    devices ||--o{ machine_event_logs : tracks
+    devices ||--|| forecasts : predicts
 ```
 
 ---
@@ -64,8 +66,8 @@ erDiagram
 | Column | Type | Description | Note |
 | :--- | :--- | :--- | :--- |
 | `id` | `uuid` (PK) | 기기 고유 ID | `gen_random_uuid()` |
-| `user_id` | `uuid` (FK) | 소유주 ID (`auth.users`) | RLS 기준 |
-| `external_id` | `text` | ESP32 하드웨어 시리얼 넘버 | 예: "esp32_ab12" |
+| `user_id` | `uuid` (FK) | 소유주 ID (`auth.users`) | RLS 기준 (Indexing 필수) |
+| `external_id` | `text` | ESP32 하드웨어 시리얼 넘버 | Unique Index 필수 |
 | `name` | `text` | 사용자 지정 별칭 | 예: "워크인 냉동고" |
 | `model_type` | `text` | 설비 유형 | 'FREEZER', 'HVAC' 등 |
 | `status` | `text` | 현재 상태 (UI 표시용) | 'GOOD', 'WARNING', 'DANGER' |
@@ -74,25 +76,25 @@ erDiagram
 | `last_seen_at` | `timestamptz` | 마지막 통신 시각 | 오프라인 감지용 |
 | `created_at` | `timestamptz` | 등록일 | |
 
-*   **Indexes**: `idx_devices_user_id`, `idx_devices_config` (GIN)
+*   **Indexes**: `idx_devices_user_id`, `idx_devices_external_id` (Unique), `idx_devices_config` (GIN)
 
 ---
 
 ### 3️⃣ Telemetry & Logs (데이터 수집)
 
 #### `telemetry_logs`
-SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저장합니다. 구조가 바뀌어도 스키마 변경이 필요 없도록 JSONB를 사용합니다.
+SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저장합니다. 
 
 | Column | Type | Description | Note |
 | :--- | :--- | :--- | :--- |
-| `id` | `bigint` (PK) | 자동 증가 ID | 대용량 데이터 최적화 |
+| `id` | `bigint` (PK) | 자동 증가 ID | 대용량 데이터 최적화 (Partitioning 고려) |
 | `device_id` | `uuid` (FK) | 기기 ID | `ON DELETE CASCADE` |
 | `features` | `jsonb` | **[핵심] 주파수별 특징 데이터** | 예: `{"60hz": 0.5, "120hz": 0.2, "temp": -18}` |
 | `state_token` | `text` | 가동 모드 [ON, OFF, STR, UNL, DEF] | Pulse Status용 |
 | `is_machine_on` | `bool` | 가동 여부 (SoundLab 알고리즘 결과) | 리포트 통계용 |
 | `captured_at` | `timestamptz` | 데이터 수집 시각 | |
 
-*   **Indexes**: `idx_telemetry_device_time` (복합 인덱스), `idx_telemetry_features` (GIN)
+*   **Indexes**: `idx_telemetry_device_time` (복합: device_id + captured_at DESC), `idx_telemetry_features` (GIN)
 
 #### `incidents` (이상 징후)
 임계값 초과 등 이벤트가 발생했을 때만 기록됩니다.
@@ -112,7 +114,7 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 ### 4️⃣ Reporting & Maintenance (분석 및 조치)
 
 #### `daily_reports`
-매일 밤 생성되는 영수증 형태의 요약 리포트입니다. 앱은 이 테이블만 조회하면 되므로 로딩이 매우 빠릅니다.
+매일 밤 생성되는 영수증 형태의 요약 리포트입니다.
 
 | Column | Type | Description | Note |
 | :--- | :--- | :--- | :--- |
@@ -127,7 +129,7 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 | `haccp_status` | `text` | HACCP 준수 여부 (PASS/FAIL) | |
 | `created_at` | `timestamptz` | 생성 시각 | |
 
-#### `maintenance_logs` (유지보수 이력) - **New for Action**
+#### `maintenance_logs` (유지보수 이력)
 사용자가 직접 수행한 관리 이력을 기록합니다. AI 예지 보전의 강력한 근거 데이터가 됩니다.
 
 | Column | Type | Description | Note |
@@ -139,7 +141,7 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 | `performed_at` | `timestamptz` | 수행 일시 | |
 | `images` | `text[]` | 증빙 사진 URL 배열 (옵션) | |
 
-#### `service_tickets` (수리 요청) - **New for Service**
+#### `service_tickets` (수리 요청)
 심각한 문제 발생 시 앱 내에서 수리 기사를 호출하고 관리하는 티켓입니다.
 
 | Column | Type | Description | Note |
@@ -153,7 +155,7 @@ SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저
 | `scheduled_at` | `timestamptz` | 방문 예정 시간 | |
 | `resolved_at` | `timestamptz` | 해결 완료 시간 | |
 
-#### 5️⃣ Advanced Analytics (고급 분석) - **New for Spec**
+### 5️⃣ Advanced Analytics (고급 분석)
 
 #### `machine_event_logs` (1분 단위 정밀 로그)
 HACCP 법적 증빙을 위한 상세 이벤트 타임라인입니다.
@@ -172,48 +174,81 @@ HACCP 법적 증빙을 위한 상세 이벤트 타임라인입니다.
 
 | Column | Type | Description | Note |
 | :--- | :--- | :--- | :--- |
-| `device_id` | `uuid` (PK, FK) | | |
+| `device_id` | `uuid` (PK, FK) | | One-to-One with devices |
 | `prediction_data` | `jsonb` | 미래 3일간의 Mean/Uncertainty 배열 | |
 | `golden_time` | `timestamptz` | 고장 임계치 도달 예상 시점 | 카운트다운용 |
 | `updated_at` | `timestamptz` | 모델 갱신 시각 | |
 
 ---
 
-## 4. SQL Migration Script (Snippet)
+## 4. Initialization SQL
 
-아래는 Supabase SQL Editor에서 바로 실행 가능한 핵심 테이블 생성 스크립트 예시입니다.
+Supabase SQL Editor에서 실행하여 테이블을 생성할 수 있습니다.
 
 ```sql
--- Enable UUID extension
+-- Enable Extensions
 create extension if not exists "uuid-ossp";
 
--- 1. Devices Table with JSONB Config
+-- 1. Devices & Config
 create table public.devices (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references auth.users(id) not null,
+  external_id text, -- unique index below
   name text not null,
+  model_type text,
   status text default 'GOOD',
-  config jsonb default '{"algo_ver": "5.7", "auto_threshold": true}'::jsonb,
+  config jsonb default '{"algo_ver": "5.7"}'::jsonb,
+  location_info jsonb,
+  last_seen_at timestamptz,
   created_at timestamptz default now()
 );
+create unique index idx_devices_external_id on public.devices (external_id);
+create index idx_devices_user_id on public.devices (user_id);
 
--- 2. Telemetry Logs with GIN Index
+-- 2. Telemetry (TimeSeries)
 create table public.telemetry_logs (
   id bigint generated by default as identity primary key,
   device_id uuid references public.devices(id) on delete cascade,
   features jsonb not null, 
+  state_token text,
   is_machine_on boolean default false,
   captured_at timestamptz default now()
 );
+create index idx_telemetry_device_time on public.telemetry_logs (device_id, captured_at desc);
 
-create index idx_telemetry_features on public.telemetry_logs using gin (features);
+-- 3. Daily Reports (Aggregation)
+create table public.daily_reports (
+  report_date date not null,
+  device_id uuid references public.devices(id) on delete cascade,
+  total_runtime int default 0,
+  cycle_count int default 0,
+  health_score int default 100,
+  roi_data jsonb,
+  diagnostics jsonb,
+  ai_summary text,
+  haccp_status text default 'PASS',
+  created_at timestamptz default now(),
+  primary key (report_date, device_id)
+);
 
--- 3. Maintenance Logs for User Actions
+-- 4. Incidents
+create table public.incidents (
+  id uuid default gen_random_uuid() primary key,
+  device_id uuid references public.devices(id) on delete cascade,
+  type text not null,
+  severity float default 0.0,
+  details jsonb,
+  user_feedback text default 'NONE',
+  created_at timestamptz default now()
+);
+
+-- 5. Maintenance
 create table public.maintenance_logs (
   id uuid default gen_random_uuid() primary key,
   device_id uuid references public.devices(id) on delete cascade,
-  action_type text not null, -- 'CLEANING', 'REPAIR'
+  action_type text not null,
   description text,
-  performed_at timestamptz default now()
+  performed_at timestamptz default now(),
+  images text[]
 );
 ```
