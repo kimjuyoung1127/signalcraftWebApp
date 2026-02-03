@@ -78,6 +78,7 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 
 ## ✅ Phase 13: Vertical Slice (Settings & Profile)
 - [x] **Profile Integration**: `ProfileCard.tsx`에서 실제 Supabase 계정 정보 및 연결 기기 수(5대) 표시 구현
+- [x] **State Management**: `tanstack-query` (v5) 도입하여 서버 상태 관리 및 캐싱 구조 표준화
 - [x] **Account Logic**: 1개의 슈퍼 계정에 5개의 기기가 연결된 1:N 구조 데이터 흐름 검증
 
 ## 🚀 Future Roadmap (Pending)

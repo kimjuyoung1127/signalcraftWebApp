@@ -1,6 +1,6 @@
 import { User } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 
 interface UserProfile {
     user: {
@@ -13,26 +13,18 @@ interface UserProfile {
 }
 
 export function ProfileCard() {
-    const [profile, setProfile] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/shared/user-profile/me`);
-                const data = await response.json();
-                setProfile(data);
-            } catch (error) {
-                console.error('Error fetching profile:', error);
-            } finally {
-                setLoading(false);
+    const { data: profile, isPending } = useQuery<UserProfile>({
+        queryKey: ['user', 'profile'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/shared/user-profile/me`);
+            if (!response.ok) {
+                throw new Error('프로필 정보를 불러오는데 실패했습니다.');
             }
-        };
+            return response.json();
+        },
+    });
 
-        fetchProfile();
-    }, []);
-
-    if (loading) {
+    if (isPending) {
         return (
             <div className="flex items-center gap-4 p-4 bg-white rounded-[1.5rem] shadow-sm animate-pulse border border-slate-100">
                 <div className="size-16 rounded-full bg-slate-100" />
