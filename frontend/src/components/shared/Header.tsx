@@ -4,14 +4,25 @@ import { Bell, User, Factory, Download } from 'lucide-react';
 import { NotificationModal } from './NotificationModal';
 import { UserProfileModal } from './UserProfileModal';
 import { usePWAInstall } from '@/lib/usePWAInstall';
+import { useQuery } from '@tanstack/react-query';
 
 export function Header() {
     const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { isInstallable, isInstalled, isIOS, installPWA } = usePWAInstall();
 
+    const { data } = useQuery({
+        queryKey: ['notifications'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications/`);
+            if (!response.ok) throw new Error('알림 로딩 실패');
+            return response.json();
+        },
+    });
+
+    const unreadCount = data?.notifications?.filter((n: any) => !n.isRead).length || 0;
+
     // Show button if it's installable OR if it's iOS and not yet installed
-    // Note: iOS doesn't support the programmatic prompt, so we can show a guide modal or tooltip
     const showInstallButton = (isInstallable || (isIOS && !isInstalled)) && !isInstalled;
 
     return (
@@ -45,7 +56,11 @@ export function Header() {
                         className="p-2.5 text-slate-500 hover:bg-white rounded-xl transition-colors relative active:scale-90"
                     >
                         <Bell size={22} />
-                        <span className="absolute top-2.5 right-2.5 size-2 bg-rose-500 rounded-full border-2 border-slate-50" />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-2.5 right-2.5 size-4 bg-rose-500 text-[10px] text-white font-black flex items-center justify-center rounded-full border-2 border-slate-50 animate-in zoom-in duration-300">
+                                {unreadCount > 9 ? '9+' : unreadCount}
+                            </span>
+                        )}
                     </button>
                     <button
                         onClick={() => setIsProfileOpen(true)}
@@ -56,7 +71,6 @@ export function Header() {
                 </div>
             </header>
 
-            {/* Modals - Moved outside <header> to avoid z-index stacking context restrictions */}
             <NotificationModal
                 isOpen={isNotifOpen}
                 onClose={() => setIsNotifOpen(false)}

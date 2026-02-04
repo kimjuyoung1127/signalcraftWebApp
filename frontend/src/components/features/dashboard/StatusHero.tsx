@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertCircle, Loader2 } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import { AIInsightModal } from '../reports/AIInsightModal';
 
@@ -30,13 +30,28 @@ interface DashboardSummary {
     DANGER: number;
 }
 
-export function StatusHero({ summary }: { summary?: DashboardSummary }) {
+interface StatusHeroProps {
+    summary?: DashboardSummary;
+    isLoading?: boolean;
+}
+
+export function StatusHero({ summary, isLoading }: StatusHeroProps) {
     const [isInsightOpen, setIsInsightOpen] = useState(false);
 
     const hasDanger = (summary?.DANGER || 0) > 0;
     const hasWarning = (summary?.WARNING || 0) > 0;
 
     const getStatusInfo = () => {
+        if (isLoading) {
+            return {
+                title: "설비 상태를\n확인하는 중입니다",
+                subtitle: "잠시만 기다려 주세요...",
+                color: "from-slate-400 to-slate-500",
+                shadow: "shadow-slate-400/20",
+                icon: <Loader2 className="size-12 text-white animate-spin" />,
+                isInitial: true
+            };
+        }
         if (hasDanger) {
             return {
                 title: "즉시 점검이 필요한\n설비가 있어요",
@@ -74,26 +89,31 @@ export function StatusHero({ summary }: { summary?: DashboardSummary }) {
                 animate="visible"
                 className="px-4 py-2 pb-6"
             >
-                <div className={`w-full bg-linear-to-br ${status.color} rounded-[2.5rem] p-10 shadow-2xl ${status.shadow} text-white flex flex-col items-center justify-center text-center relative overflow-hidden group`}>
+                <div className={`w-full bg-linear-to-br ${status.color} rounded-[2.5rem] p-10 shadow-2xl ${status.shadow} text-white flex flex-col items-center justify-center text-center relative overflow-hidden group transition-colors duration-500`}>
                     {/* Dynamic Background blobs */}
-                    <motion.div
-                        animate={{
-                            x: [0, 40, 0],
-                            y: [0, -40, 0],
-                            scale: [1, 1.2, 1]
-                        }}
-                        transition={{ repeat: Infinity, duration: 15, ease: "easeInOut" }}
-                        className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-white/10 rounded-full blur-[60px]"
-                    />
-                    <motion.div
-                        animate={{
-                            x: [0, -40, 0],
-                            y: [0, 40, 0],
-                            scale: [1, 1.3, 1]
-                        }}
-                        transition={{ repeat: Infinity, duration: 18, ease: "easeInOut", delay: 1 }}
-                        className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-signal-mint/10 rounded-full blur-[60px]"
-                    />
+                    {!isLoading && (
+                        <>
+                            <motion.div
+                                animate={{
+                                    x: [0, 40, 0],
+                                    y: [0, -40, 0],
+                                    scale: [1, 1.2, 1]
+                                }}
+                                transition={{ repeat: Infinity, duration: 15, ease: "easeInOut" }}
+                                className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-white/10 rounded-full blur-[60px]"
+                            />
+                            <motion.div
+                                animate={{
+                                    x: [0, -40, 0],
+                                    y: [0, 40, 0],
+                                    scale: [1, 1.3, 1]
+                                }}
+                                transition={{ repeat: Infinity, duration: 18, ease: "easeInOut", delay: 1 }}
+                                className="absolute bottom-0 left-0 -mb-20 -ml-20 w-64 h-64 bg-signal-mint/10 rounded-full blur-[60px]"
+                            />
+                        </>
+                    )}
+
                     <motion.div
                         animate={{
                             opacity: [0.1, 0.2, 0.1],
@@ -106,10 +126,10 @@ export function StatusHero({ summary }: { summary?: DashboardSummary }) {
                     <div className="relative z-10 flex flex-col items-center gap-6">
                         <motion.div
                             variants={itemVariants}
-                            whileHover={{ scale: 1.05, rotate: [0, -5, 5, 0] }}
+                            whileHover={isLoading ? {} : { scale: 1.05, rotate: [0, -5, 5, 0] }}
                             transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         >
-                            <div className="p-4 bg-white/20 rounded-full backdrop-blur-md border border-white/30 shadow-lg group-hover:bg-white/30 transition-colors">
+                            <div className={`p-4 ${isLoading ? 'bg-white/10' : 'bg-white/20'} rounded-full backdrop-blur-md border border-white/30 shadow-lg transition-colors`}>
                                 {status.icon}
                             </div>
                         </motion.div>
@@ -129,19 +149,21 @@ export function StatusHero({ summary }: { summary?: DashboardSummary }) {
                             </motion.p>
                         </div>
 
-                        <motion.button
-                            variants={itemVariants}
-                            whileHover={{ scale: 1.05, backgroundColor: 'rgba(0, 0, 0, 0.2)' }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsInsightOpen(true)}
-                            className="flex items-center gap-2 bg-black/10 backdrop-blur-xl px-5 py-2.5 rounded-full border border-white/10 group-hover:bg-black/20 transition-all cursor-pointer"
-                        >
-                            <div className="relative flex items-center justify-center">
-                                <div className="size-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
-                                <div className="absolute size-4 border border-emerald-400/50 rounded-full animate-ping" />
-                            </div>
-                            <span className="text-[11px] font-black uppercase tracking-widest text-blue-50">AI Live Monitoring</span>
-                        </motion.button>
+                        {!isLoading && (
+                            <motion.button
+                                variants={itemVariants}
+                                whileHover={{ scale: 1.05, backgroundColor: 'rgba(0, 0, 0, 0.2)' }}
+                                whileTap={{ scale: 0.95 }}
+                                onClick={() => setIsInsightOpen(true)}
+                                className="flex items-center gap-2 bg-black/10 backdrop-blur-xl px-5 py-2.5 rounded-full border border-white/10 group-hover:bg-black/20 transition-all cursor-pointer"
+                            >
+                                <div className="relative flex items-center justify-center">
+                                    <div className="size-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.5)]" />
+                                    <div className="absolute size-4 border border-emerald-400/50 rounded-full animate-ping" />
+                                </div>
+                                <span className="text-[11px] font-black uppercase tracking-widest text-blue-50">AI Live Monitoring</span>
+                            </motion.button>
+                        )}
                     </div>
                 </div>
             </motion.div>

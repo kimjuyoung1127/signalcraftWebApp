@@ -27,7 +27,7 @@ export function DashboardPage() {
         },
     });
 
-    const { data: summary } = useQuery<DashboardSummary>({
+    const { data: summary, isLoading: isSummaryLoading } = useQuery<DashboardSummary>({
         queryKey: ['dashboard', 'summary'],
         queryFn: async () => {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard/summary`);
@@ -47,7 +47,7 @@ export function DashboardPage() {
                     <h2 className="text-2xl font-black text-slate-900 tracking-tight">좋은 아침입니다 👋</h2>
                 </div>
 
-                <StatusHero summary={summary} />
+                <StatusHero summary={summary} isLoading={isSummaryLoading} />
 
                 <div className="mt-8">
                     <span className="px-6 section-label">Quick Actions</span>
