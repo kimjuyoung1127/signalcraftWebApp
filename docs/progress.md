@@ -77,16 +77,25 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Legacy Migration**: 기존 `sound_logs` 데이터(1,456건)를 V2 스키마로 성공적으로 이관 및 무결성 검증
 
 ## ✅ Phase 13: Vertical Slice (Settings & Profile)
-- [x] **Profile Integration**: `ProfileCard.tsx`에서 실제 Supabase 계정 정보 및 연결 기기 수(5대) 표시 구현
-- [x] **State Management**: `tanstack-query` (v5) 도입하여 서버 상태 관리 및 캐싱 구조 표준화
-- [x] **Account Logic**: 1개의 슈퍼 계정에 5개의 기기가 연결된 1:N 구조 데이터 흐름 검증
+- [x] Account Logic: 1개의 슈퍼 계정에 5개의 기기가 연결된 1:N 구조 데이터 흐름 검증
+
+## ✅ Phase 14: Dashboard & Infrastructure Integration
+- [x] **Dashboard Summary**: `StatusHero`에 실제 Supabase 기기 상태(정상/주의/위험) 기반의 동적 테마 및 문구 자동 적용
+- [x] **Machine Connectivity**: `MachineList` 및 `MachinePage`에서 실제 DB의 기기 목록을 실시간으로 패칭 및 로딩/에러 UI 구현
+- [x] **TanStack Query Implementation**: 대시보드 내의 모든 서버 상태를 `useQuery`로 전환하여 캐싱 및 효율성 최적화
+- [x] **Database Seeding**: 디버깅을 위해 다양한 상태(`GOOD`, `WARNING`, `DANGER`)의 기기 데이터를 Supabase에 시딩
+
+## ✅ Phase 15: Navigation & General Productivity
+- [x] **Home Button Activation**: 헤더의 로고와 타이틀에 `Link`를 적용하여 원클릭 홈(대시보드) 이동 기능 활성화
+- [x] **Backend Bug Fix**: `dashboard/router.py` 내의 이름 오류(`NameError`) 및 임포트 누락 건 일괄 해결
+- [x] **Refined Interactivity**: 홈 버튼 클릭 시 애니메이션 효과(Scale Down) 추가로 프리미엄 UX 강화
 
 ## 🚀 Future Roadmap (Pending)
 - [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
-- [/] **Backend Logic Implementation**: 분리된 각 기능별 비즈니스 로직 및 Supabase 연동 구현
+- [x] **Backend Logic Implementation**: Dashboard 및 Machine List 관련 Supabase 연동 및 API 구현 완료
 - [ ] **Dark Mode Support**: 눈이 편안한 저조도 환경을 위한 전역 다크 모드 테마 구현 (구현 예정)
 - [ ] **PWA Manifest**: 오프라인 모드 및 설치 가능한 앱 환경 구성
 - [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
 
 ---
-*마지막 업데이트: 2026-02-03 (12:02 PM)*
+*마지막 업데이트: 2026-02-04 (01:15 PM)*

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Activity, Volume2, History, FileText } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { type Machine } from '../MachineCard';
 import { cn } from '../../../../lib/utils';
 import { AnalysisTab } from './AnalysisTab';
@@ -9,6 +10,7 @@ import { MaintenanceTab } from './MaintenanceTab';
 import { type MachineDetailModalProps, type TabType, type MaintenanceView } from './types';
 
 export function MachineDetailModal({ machine, isOpen, onClose, initialView = 'analysis' }: MachineDetailModalProps) {
+    const queryClient = useQueryClient();
     const [activeTab, setActiveTab] = useState<TabType>(initialView);
     const [maintenanceView, setMaintenanceView] = useState<MaintenanceView>('history');
 
@@ -16,6 +18,30 @@ export function MachineDetailModal({ machine, isOpen, onClose, initialView = 'an
     const [symptom, setSymptom] = useState('');
     const [visitDate, setVisitDate] = useState('');
     const [urgency, setUrgency] = useState<'normal' | 'urgent'>('normal');
+
+    // Service Ticket Mutation
+    const { mutate: submitTicket, isPending: isSubmitting } = useMutation({
+        mutationFn: async () => {
+            const body = {
+                device_id: machine?.id,
+                issue_type: "MAINTENANCE",
+                description: symptom,
+                urgency: urgency,
+                visit_date: visitDate || null
+            };
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard/machine-detail/service-tickets`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            if (!response.ok) throw new Error('서비스 신청에 실패했습니다.');
+            return response.json();
+        },
+        onSuccess: () => {
+            setMaintenanceView('success');
+            queryClient.invalidateQueries({ queryKey: ['machine-maintenance'] });
+        }
+    });
 
     useEffect(() => {
         if (isOpen) {
@@ -39,8 +65,7 @@ export function MachineDetailModal({ machine, isOpen, onClose, initialView = 'an
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Mock submission
-        setMaintenanceView('success');
+        submitTicket();
     };
 
     const getStatusTheme = (status: Machine['status']) => {
@@ -138,11 +163,12 @@ export function MachineDetailModal({ machine, isOpen, onClose, initialView = 'an
                                 )}
 
                                 {activeTab === 'smartlog' && (
-                                    <SmartLogTab />
+                                    <SmartLogTab machine={machine} />
                                 )}
 
                                 {activeTab === 'maintenance' && (
                                     <MaintenanceTab
+                                        machine={machine}
                                         maintenanceView={maintenanceView}
                                         setMaintenanceView={setMaintenanceView}
                                         symptom={symptom}
@@ -152,6 +178,7 @@ export function MachineDetailModal({ machine, isOpen, onClose, initialView = 'an
                                         urgency={urgency}
                                         setUrgency={setUrgency}
                                         onSubmit={handleSubmit}
+                                        isSubmitting={isSubmitting}
                                     />
                                 )}
                             </AnimatePresence>
@@ -162,3 +189,4 @@ export function MachineDetailModal({ machine, isOpen, onClose, initialView = 'an
         </AnimatePresence>
     );
 }
+

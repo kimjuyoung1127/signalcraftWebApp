@@ -83,7 +83,7 @@ erDiagram
 ### 3️⃣ Telemetry & Logs (데이터 수집)
 
 #### `telemetry_logs`
-SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저장합니다. 
+SoundLab의 노하우를 담아 10초마다 들어오는 센서 데이터를 저장합니다. 구조가 바뀌어도 스키마 변경이 필요 없도록 JSONB를 사용합니다.
 
 | Column | Type | Description | Note |
 | :--- | :--- | :--- | :--- |

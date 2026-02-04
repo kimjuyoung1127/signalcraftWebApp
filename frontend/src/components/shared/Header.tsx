@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Bell, User, Factory, Download } from 'lucide-react';
 import { NotificationModal } from './NotificationModal';
 import { UserProfileModal } from './UserProfileModal';
@@ -16,12 +17,12 @@ export function Header() {
     return (
         <>
             <header className="flex items-center bg-slate-50 p-4 justify-between sticky top-0 z-40 backdrop-blur-md bg-opacity-80 border-b border-slate-100">
-                <div className="flex items-center gap-3">
+                <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity active:scale-95">
                     <div className="text-white flex size-10 items-center justify-center rounded-2xl bg-signal-blue shadow-lg shadow-blue-500/20">
                         <Factory size={22} />
                     </div>
                     <h2 className="text-slate-900 text-xl font-extrabold leading-tight tracking-tight">SignalCraft</h2>
-                </div>
+                </Link>
 
                 <div className="flex items-center gap-2">
                     {showInstallButton && (

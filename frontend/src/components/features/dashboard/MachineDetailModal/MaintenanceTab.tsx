@@ -1,10 +1,13 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, History, Plus, CheckCircle2, Settings2, X, Clock } from 'lucide-react';
+import { AlertCircle, History, Plus, CheckCircle2, Settings2, X, Clock, Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '../../../ui/Button';
 import { cn } from '../../../../lib/utils';
 import { type MaintenanceView } from './types';
+import { type Machine } from '../MachineCard';
 
 interface MaintenanceTabProps {
+    machine: Machine;
     maintenanceView: MaintenanceView;
     setMaintenanceView: (view: MaintenanceView) => void;
     symptom: string;
@@ -14,9 +17,11 @@ interface MaintenanceTabProps {
     urgency: 'normal' | 'urgent';
     setUrgency: (u: 'normal' | 'urgent') => void;
     onSubmit: (e: React.FormEvent) => void;
+    isSubmitting?: boolean;
 }
 
 export function MaintenanceTab({
+    machine,
     maintenanceView,
     setMaintenanceView,
     symptom,
@@ -25,8 +30,18 @@ export function MaintenanceTab({
     setVisitDate,
     urgency,
     setUrgency,
-    onSubmit
+    onSubmit,
+    isSubmitting
 }: MaintenanceTabProps) {
+    const { data: history, isPending } = useQuery<any[]>({
+        queryKey: ['maintenance-history', machine.id],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard/machine-detail/maintenance?machine_id=${machine.id}`);
+            if (!response.ok) throw new Error('유지보수 이력을 불러오는데 실패했습니다.');
+            return response.json();
+        },
+    });
+
     return (
         <motion.div
             key="maintenance"
@@ -44,7 +59,7 @@ export function MaintenanceTab({
                         exit={{ opacity: 0, y: -10 }}
                         className="space-y-8"
                     >
-                        {/* Smart Advice Card */}
+                        {/* Smart Advice Card (Maintenance Context) */}
                         <section>
                             <div className="p-6 rounded-[2.5rem] bg-amber-50 border border-amber-100 relative overflow-hidden">
                                 <div className="flex items-start gap-4">
@@ -52,9 +67,13 @@ export function MaintenanceTab({
                                         <AlertCircle size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="text-lg font-black text-slate-900 leading-tight mb-1 break-keep">점검이 필요해 보여요</h3>
+                                        <h3 className="text-lg font-black text-slate-900 leading-tight mb-1 break-keep">
+                                            {machine.status === 'warning' ? '점검이 권장되는 상태입니다' : '정기 점검을 관리해보세요'}
+                                        </h3>
                                         <p className="text-sm text-slate-500 font-bold leading-relaxed break-keep">
-                                            마지막 청소 이후 <span className="text-amber-600">32일</span>이 지났습니다. 기계 소리가 평소와 달라 점검을 권장합니다.
+                                            {machine.status === 'warning'
+                                                ? "최근 기계 소리에서 미세한 마찰음이 감지되었습니다. 큰 고장으로 이어지기 전에 소모품 점검을 추천합니다."
+                                                : "현재 설비 상태가 안정적입니다. 주기적인 필터 청소만으로도 설비 수명을 20% 이상 연장할 수 있습니다."}
                                         </p>
                                     </div>
                                 </div>
@@ -74,28 +93,37 @@ export function MaintenanceTab({
                                 </Button>
                             </div>
 
-                            <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-100">
-                                {[
-                                    { date: '2026. 01. 15', action: '필터 청소 및 성에 제거', type: 'CLEANING', provider: '사장님' },
-                                    { date: '2025. 12. 01', action: '정기 점검 및 가스 보충', type: 'CHECK', provider: '서비스 센터' },
-                                    { date: '2025. 11. 15', action: '문 고무 패킹 교체', type: 'PART_REPLACE', provider: '사장님' },
-                                ].map((log, i) => (
-                                    <div key={i} className="relative flex items-start gap-6 pl-2">
-                                        <div className="mt-1.5 size-6 shrink-0 rounded-full border-4 border-white bg-signal-blue shadow-sm z-10" />
-                                        <div className="flex-1 p-5 rounded-[1.5rem] bg-white border border-slate-100 shadow-sm">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{log.date}</span>
-                                                <span className="text-[10px] px-2 py-0.5 bg-slate-50 text-slate-500 rounded-full font-bold">{log.provider}</span>
-                                            </div>
-                                            <h4 className="text-[15px] font-black text-slate-800 mb-2">{log.action}</h4>
-                                            <div className="flex items-center gap-1.5">
-                                                <CheckCircle2 size={14} className="text-emerald-500" />
-                                                <span className="text-xs font-bold text-emerald-500">완료됨</span>
+                            {isPending ? (
+                                <div className="flex flex-col items-center justify-center py-12 gap-3">
+                                    <Loader2 className="size-6 text-signal-blue animate-spin" />
+                                    <p className="text-slate-400 font-bold text-xs">이력을 불러오고 있습니다...</p>
+                                </div>
+                            ) : (
+                                <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-100">
+                                    {history && history.length > 0 ? history.map((log, i) => (
+                                        <div key={i} className="relative flex items-start gap-6 pl-2">
+                                            <div className="mt-1.5 size-6 shrink-0 rounded-full border-4 border-white bg-signal-blue shadow-sm z-10" />
+                                            <div className="flex-1 p-5 rounded-[1.5rem] bg-white border border-slate-100 shadow-sm">
+                                                <div className="flex justify-between items-start mb-1">
+                                                    <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                                                        {new Date(log.performed_at).toLocaleDateString()}
+                                                    </span>
+                                                    <span className="text-[10px] px-2 py-0.5 bg-slate-50 text-slate-500 rounded-full font-bold">
+                                                        {log.action_type}
+                                                    </span>
+                                                </div>
+                                                <h4 className="text-[15px] font-black text-slate-800 mb-2">{log.description}</h4>
+                                                <div className="flex items-center gap-1.5">
+                                                    <CheckCircle2 size={14} className="text-emerald-500" />
+                                                    <span className="text-xs font-bold text-emerald-500">조회됨</span>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
+                                    )) : (
+                                        <div className="pl-12 py-8 text-slate-400 text-sm font-bold">등록된 관리 이력이 없습니다.</div>
+                                    )}
+                                </div>
+                            )}
                         </section>
 
                         {/* Call Technician (Service Ticket Bridge) */}
@@ -145,6 +173,7 @@ export function MaintenanceTab({
                                     onChange={(e) => setSymptom(e.target.value)}
                                     className="w-full h-32 p-4 rounded-2xl bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-signal-blue/20 focus:border-signal-blue text-sm font-bold text-slate-600 resize-none break-keep"
                                     placeholder="기계 소리가 크거나 시원하지 않은 등 증상을 적어주세요."
+                                    required
                                 />
                             </div>
 
@@ -188,9 +217,11 @@ export function MaintenanceTab({
                             <div className="pt-4">
                                 <Button
                                     type="submit"
-                                    className="w-full h-14 bg-signal-blue hover:bg-blue-600 text-white rounded-[1.5rem] font-black text-lg transition-all active:scale-95 shadow-xl shadow-blue-500/20"
+                                    disabled={isSubmitting}
+                                    className="w-full h-14 bg-signal-blue hover:bg-blue-600 text-white rounded-[1.5rem] font-black text-lg transition-all active:scale-95 shadow-xl shadow-blue-500/20 disabled:opacity-50"
                                 >
-                                    서비스 신청하기
+                                    {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : null}
+                                    {isSubmitting ? '신청 중...' : '서비스 신청하기'}
                                 </Button>
                                 <button
                                     type="button"
@@ -232,3 +263,4 @@ export function MaintenanceTab({
         </motion.div>
     );
 }
+

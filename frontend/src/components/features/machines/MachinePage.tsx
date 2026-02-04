@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
-import { Search, Map, LayoutGrid, MapPin } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Search, Map, LayoutGrid, MapPin, Loader2 } from 'lucide-react';
 import { Header } from '../../shared/Header';
 import { BottomNav } from '../../shared/BottomNav';
 import { MachineCard, Machine } from '../dashboard/MachineCard';
@@ -8,60 +9,6 @@ import { MachineFilters, FilterType } from './MachineFilters';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../../lib/utils';
 
-// Mock Data (DashBoard와 동일한 데이터 사용, 실제로는 API 연동 필요)
-const MOCK_MACHINES: Machine[] = [
-    {
-        id: '1',
-        name: '워크인 냉동고 A',
-        location: '제1 물류창고',
-        status: 'running',
-        health: 98,
-        prediction: '향후 7일간 특이사항 없음',
-        imageUrl: 'https://placehold.co/200x200?text=Freezer',
-        type: 'Freezer'
-    },
-    {
-        id: '2',
-        name: '산업용 컴프레서 B',
-        location: '본관 기계실',
-        status: 'warning',
-        health: 72,
-        prediction: '베어링 마모 징후 (96% 확률)',
-        imageUrl: 'https://placehold.co/200x200?text=Compressor',
-        type: 'Compressor'
-    },
-    {
-        id: '3',
-        name: '배기 공조 시스템 C',
-        location: '옥상',
-        status: 'running',
-        health: 94,
-        prediction: '효율 최적화 상태 유지 중',
-        imageUrl: 'https://placehold.co/200x200?text=HVAC',
-        type: 'HVAC'
-    },
-    {
-        id: '4',
-        name: '수화물 컨베이어 벨트',
-        location: '제2 작업장',
-        status: 'error',
-        health: 45,
-        prediction: '모터 과열 위험 감지됨',
-        imageUrl: 'https://placehold.co/200x200?text=Conveyor',
-        type: 'Conveyor'
-    },
-    {
-        id: '5',
-        name: '유압 프레스 3호기',
-        location: '생산라인 B',
-        status: 'running',
-        health: 92,
-        prediction: '정상 작동 중',
-        imageUrl: 'https://placehold.co/200x200?text=Press',
-        type: 'Press'
-    }
-];
-
 export function MachinePage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState<FilterType>('all');
@@ -69,15 +16,26 @@ export function MachinePage() {
     const [initialView, setInitialView] = useState<'analysis' | 'maintenance'>('analysis');
     const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
+    const { data, isPending, error } = useQuery<{ machines: Machine[] }>({
+        queryKey: ['machines'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/machines/`);
+            if (!response.ok) throw new Error('설비 목록을 불러오는데 실패했습니다.');
+            return response.json();
+        },
+    });
+
+    const machines = data?.machines || [];
+
     const filteredMachines = useMemo(() => {
-        return MOCK_MACHINES.filter(machine => {
+        return machines.filter(machine => {
             const matchesSearch = machine.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 machine.location.toLowerCase().includes(searchTerm.toLowerCase());
             const matchesFilter = filter === 'all' ||
                 (filter === 'stopped' ? machine.status === 'error' : machine.status === filter);
             return matchesSearch && matchesFilter;
         });
-    }, [searchTerm, filter]);
+    }, [machines, searchTerm, filter]);
 
     const handleCardClick = (machine: Machine) => {
         setInitialView('analysis');
@@ -143,7 +101,22 @@ export function MachinePage() {
 
                 {/* Machines Content */}
                 <div className="px-2 pt-2 pb-6 space-y-1">
-                    {viewMode === 'list' ? (
+                    {isPending ? (
+                        <div className="flex flex-col items-center justify-center py-24 gap-4">
+                            <Loader2 className="size-8 text-signal-blue animate-spin" />
+                            <p className="text-slate-400 font-bold text-sm">설비 정보를 불러오고 있습니다...</p>
+                        </div>
+                    ) : error ? (
+                        <div className="mx-6 p-8 bg-rose-50 rounded-[2rem] border border-rose-100 text-center">
+                            <p className="text-rose-600 font-bold text-sm mb-4">데이터를 불러오는 중 오류가 발생했습니다.</p>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="px-6 py-2 bg-rose-500 text-white rounded-full text-xs font-black"
+                            >
+                                다시 시도
+                            </button>
+                        </div>
+                    ) : viewMode === 'list' ? (
                         <>
                             <div className="px-4 mb-3 flex items-center justify-between">
                                 <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">

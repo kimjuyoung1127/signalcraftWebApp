@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, AlertCircle } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import { AIInsightModal } from '../reports/AIInsightModal';
 
@@ -24,8 +24,47 @@ const itemVariants: Variants = {
     }
 };
 
-export function StatusHero() {
+interface DashboardSummary {
+    GOOD: number;
+    WARNING: number;
+    DANGER: number;
+}
+
+export function StatusHero({ summary }: { summary?: DashboardSummary }) {
     const [isInsightOpen, setIsInsightOpen] = useState(false);
+
+    const hasDanger = (summary?.DANGER || 0) > 0;
+    const hasWarning = (summary?.WARNING || 0) > 0;
+
+    const getStatusInfo = () => {
+        if (hasDanger) {
+            return {
+                title: "즉시 점검이 필요한\n설비가 있어요",
+                subtitle: `위험 ${summary?.DANGER}건 / 주의 ${summary?.WARNING}건 감지`,
+                color: "from-rose-500 to-rose-600",
+                shadow: "shadow-rose-500/30",
+                icon: <AlertCircle className="size-12 text-white fill-white/20" />
+            };
+        }
+        if (hasWarning) {
+            return {
+                title: "설비 상태를\n확인해 주세요",
+                subtitle: `주의 ${summary?.WARNING}건이 발생했어요`,
+                color: "from-amber-400 to-amber-500",
+                shadow: "shadow-amber-500/30",
+                icon: <AlertTriangle className="size-12 text-white fill-white/20" />
+            };
+        }
+        return {
+            title: "설비가 안전하게\n보호되고 있어요",
+            subtitle: "현재 모든 시스템이 정상입니다",
+            color: "from-signal-blue to-[#1c64f2]",
+            shadow: "shadow-blue-500/30",
+            icon: <CheckCircle2 className="size-12 text-white fill-white/20" />
+        };
+    };
+
+    const status = getStatusInfo();
 
     return (
         <>
@@ -35,7 +74,7 @@ export function StatusHero() {
                 animate="visible"
                 className="px-4 py-2 pb-6"
             >
-                <div className="w-full bg-linear-to-br from-signal-blue to-[#1c64f2] rounded-[2.5rem] p-10 shadow-2xl shadow-blue-500/30 text-white flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                <div className={`w-full bg-linear-to-br ${status.color} rounded-[2.5rem] p-10 shadow-2xl ${status.shadow} text-white flex flex-col items-center justify-center text-center relative overflow-hidden group`}>
                     {/* Dynamic Background blobs */}
                     <motion.div
                         animate={{
@@ -71,22 +110,22 @@ export function StatusHero() {
                             transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         >
                             <div className="p-4 bg-white/20 rounded-full backdrop-blur-md border border-white/30 shadow-lg group-hover:bg-white/30 transition-colors">
-                                <CheckCircle2 className="size-12 text-white fill-white/20" />
+                                {status.icon}
                             </div>
                         </motion.div>
 
                         <div className="space-y-2">
                             <motion.h1
                                 variants={itemVariants}
-                                className="text-4xl font-black tracking-tight leading-tight"
+                                className="text-4xl font-black tracking-tight leading-tight whitespace-pre-line"
                             >
-                                설비가 안전하게<br />보호되고 있어요
+                                {status.title}
                             </motion.h1>
                             <motion.p
                                 variants={itemVariants}
                                 className="text-blue-50 font-semibold opacity-80 text-lg"
                             >
-                                현재 모든 시스템이 정상입니다
+                                {status.subtitle}
                             </motion.p>
                         </div>
 

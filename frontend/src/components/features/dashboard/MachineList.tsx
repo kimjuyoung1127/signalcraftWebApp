@@ -1,43 +1,23 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { type Machine, MachineCard } from './MachineCard';
 import { MachineDetailModal } from './MachineDetailModal';
-
-const MOCK_MACHINES: Machine[] = [
-    {
-        id: '1',
-        name: '워크인 냉동고 01',
-        location: 'A구역 • 후면',
-        status: 'running',
-        health: 98,
-        prediction: 'AI 예측: 향후 30일 내 고장 징후 없음',
-        imageUrl: 'https://placehold.co/200x200?text=Freezer',
-        type: 'freezer'
-    },
-    {
-        id: '2',
-        name: '쇼케이스 냉장고 A',
-        location: 'B구역 • 카운터 옆',
-        status: 'warning',
-        health: 76,
-        prediction: '공진 노이즈 감지: 팬 베어링 점검을 권장합니다',
-        imageUrl: 'https://placehold.co/200x200?text=Fridge',
-        type: 'refrigerator'
-    },
-    {
-        id: '3',
-        name: '메인 컨베이어 02',
-        location: 'C구역 • 메인홀',
-        status: 'running',
-        health: 94,
-        prediction: '정기 점검까지 14일 남았습니다',
-        imageUrl: 'https://placehold.co/200x200?text=Conveyor',
-        type: 'conveyor'
-    }
-];
+import { Loader2 } from 'lucide-react';
 
 export function MachineList() {
     const [selectedMachine, setSelectedMachine] = useState<Machine | null>(null);
     const [initialView, setInitialView] = useState<'analysis' | 'maintenance'>('analysis');
+
+    const { data, isPending, error } = useQuery<{ machines: Machine[] }>({
+        queryKey: ['machines'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/machines/`);
+            if (!response.ok) throw new Error('설비 목록을 불러오는데 실패했습니다.');
+            return response.json();
+        },
+    });
+
+    const machines = data?.machines || [];
 
     const handleCardClick = (machine: Machine) => {
         setInitialView('analysis');
@@ -64,16 +44,33 @@ export function MachineList() {
             </div>
 
             <div className="flex flex-col gap-4">
-                {MOCK_MACHINES.map((machine, idx) => (
-                    <MachineCard
-                        key={machine.id}
-                        machine={machine}
-                        index={idx}
-                        onClick={handleCardClick}
-                        onManage={handleManage}
-                        onDelete={handleDelete}
-                    />
-                ))}
+                {isPending ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-400">
+                        <Loader2 className="size-8 animate-spin" />
+                        <p className="font-bold text-sm">설비 정보를 불러오는 중...</p>
+                    </div>
+                ) : error ? (
+                    <div className="p-6 bg-rose-50 rounded-2xl text-rose-500 text-center">
+                        <p className="font-bold text-sm">목록 로드 실패</p>
+                        <p className="text-xs opacity-80 mt-1">네트워크 상태를 확인해주세요</p>
+                    </div>
+                ) : machines.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-2 text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
+                        <p className="font-bold text-sm">등록된 설비가 없습니다</p>
+                        <p className="text-xs">새 기기를 등록해 모니터링을 시작하세요</p>
+                    </div>
+                ) : (
+                    machines.map((machine, idx) => (
+                        <MachineCard
+                            key={machine.id}
+                            machine={machine}
+                            index={idx}
+                            onClick={handleCardClick}
+                            onManage={handleManage}
+                            onDelete={handleDelete}
+                        />
+                    ))
+                )}
             </div>
 
             <MachineDetailModal

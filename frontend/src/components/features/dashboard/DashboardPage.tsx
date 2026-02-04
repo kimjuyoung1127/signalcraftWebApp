@@ -1,20 +1,53 @@
+import { useQuery } from '@tanstack/react-query';
 import { Header } from '../../shared/Header';
 import { BottomNav } from '../../shared/BottomNav';
 import { StatusHero } from './StatusHero';
 import { QuickActions } from './QuickActions';
 import { MachineList } from './MachineList';
 
+interface UserProfile {
+    user: {
+        full_name: string;
+    };
+}
+
+interface DashboardSummary {
+    GOOD: number;
+    WARNING: number;
+    DANGER: number;
+}
+
 export function DashboardPage() {
+    const { data: profile } = useQuery<UserProfile>({
+        queryKey: ['user', 'profile'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/shared/user-profile/me`);
+            if (!response.ok) throw new Error('프로필 로딩 실패');
+            return response.json();
+        },
+    });
+
+    const { data: summary } = useQuery<DashboardSummary>({
+        queryKey: ['dashboard', 'summary'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/dashboard/summary`);
+            if (!response.ok) throw new Error('요약 정보 로딩 실패');
+            return response.json();
+        },
+    });
+
     return (
         <div className="flex flex-col min-h-screen pb-24 bg-slate-50">
             <Header />
             <main className="flex-1 overflow-y-auto pt-4">
                 <div className="px-6 mb-6">
-                    <p className="text-slate-400 text-sm font-bold tracking-tight mb-1">안녕하세요, 김주영 님</p>
+                    <p className="text-slate-400 text-sm font-bold tracking-tight mb-1">
+                        안녕하세요, {profile?.user.full_name || '사용자'} 님
+                    </p>
                     <h2 className="text-2xl font-black text-slate-900 tracking-tight">좋은 아침입니다 👋</h2>
                 </div>
 
-                <StatusHero />
+                <StatusHero summary={summary} />
 
                 <div className="mt-8">
                     <span className="px-6 section-label">Quick Actions</span>
