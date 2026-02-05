@@ -123,10 +123,11 @@ export function ReportPage() {
                     {viewMode === 'report' ? (
                         <motion.div
                             key="report-content"
+                            id="report-content"
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 20 }}
-                            className="space-y-8"
+                            className="space-y-8 p-1"
                         >
                             {/* Date Selector & Device Selector */}
                             <section className="space-y-4">

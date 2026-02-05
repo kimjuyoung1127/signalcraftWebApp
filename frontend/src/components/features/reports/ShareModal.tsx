@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Share, Download, Image as ImageIcon, MessageCircle } from 'lucide-react';
-import { Button } from '../../ui/Button';
+import { X, Copy, Download, Image as ImageIcon, MessageCircle, Check, Loader2 } from 'lucide-react';
+import { cn } from '../../../lib/utils';
+import { exportToPdf, exportToImage } from '../../../lib/utils/exportUtils';
 
 interface ShareModalProps {
     isOpen: boolean;
@@ -9,6 +11,50 @@ interface ShareModalProps {
 }
 
 export function ShareModal({ isOpen, onClose, reportDate }: ShareModalProps) {
+    const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
+    const [isExporting, setIsExporting] = useState(false);
+    const [exportType, setExportType] = useState<'pdf' | 'image' | null>(null);
+
+    const showToast = (message: string, type: 'success' | 'info' = 'success') => {
+        setToast({ message, type });
+        setTimeout(() => setToast(null), 3000);
+    };
+
+    const handleShare = async (id: string, label: string) => {
+        if (id === 'link') {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                showToast('링크가 클립보드에 복사되었습니다.');
+            } catch (err) {
+                showToast('링크 복사에 실패했습니다.', 'info');
+            }
+        } else if (id === 'pdf' || id === 'image') {
+            try {
+                setIsExporting(true);
+                setExportType(id as 'pdf' | 'image');
+                const cleanDate = reportDate.replace(/\s/g, '_');
+
+                if (id === 'pdf') {
+                    await exportToPdf('report-content', `SignalCraft_Report_${cleanDate}.pdf`);
+                } else {
+                    await exportToImage('report-content', `SignalCraft_Report_${cleanDate}.png`);
+                }
+
+                showToast(`${id.toUpperCase()} 파일이 생성되었습니다.`);
+                onClose();
+            } catch (err) {
+                console.error(err);
+                showToast(`${id.toUpperCase()} 생성에 실패했습니다.`, 'info');
+            } finally {
+                setIsExporting(false);
+                setExportType(null);
+            }
+        } else {
+            // Mock logic for other features
+            showToast(`${label} 기능을 준비 중입니다.`, 'info');
+        }
+    };
+
     const shareOptions = [
         { id: 'kakao', label: '카카오톡', icon: MessageCircle, color: 'bg-[#FEE500] text-[#3c1e1e]' },
         { id: 'image', label: '이미지로 저장', icon: ImageIcon, color: 'bg-emerald-50 text-emerald-600' },
@@ -28,6 +74,21 @@ export function ShareModal({ isOpen, onClose, reportDate }: ShareModalProps) {
                         onClick={onClose}
                         className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[100]"
                     />
+
+                    {/* Toast Notification */}
+                    <AnimatePresence>
+                        {toast && (
+                            <motion.div
+                                initial={{ opacity: 0, y: -20 }}
+                                animate={{ opacity: 1, y: 20 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                className="fixed top-4 left-1/2 -translate-x-1/2 z-[110] px-6 py-3 rounded-2xl bg-slate-900 text-white shadow-xl flex items-center gap-3"
+                            >
+                                {toast.type === 'success' && <div className="size-5 rounded-full bg-emerald-500 flex items-center justify-center text-white"><Check size={12} strokeWidth={4} /></div>}
+                                <span className="text-sm font-bold">{toast.message}</span>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
                     {/* Modal Content */}
                     <motion.div
@@ -52,25 +113,32 @@ export function ShareModal({ isOpen, onClose, reportDate }: ShareModalProps) {
                         </div>
 
                         {/* Options Grid */}
-                        <div className="grid grid-cols-2 gap-4 mb-8">
+                        <div className="grid grid-cols-2 gap-4">
                             {shareOptions.map((option) => (
                                 <button
                                     key={option.id}
-                                    className="flex flex-col items-center gap-3 p-6 rounded-3xl bg-slate-50 hover:bg-slate-100 transition-all active:scale-95 group"
+                                    onClick={() => handleShare(option.id, option.label)}
+                                    disabled={isExporting}
+                                    className={cn(
+                                        "flex flex-col items-center gap-3 p-6 rounded-3xl bg-slate-50 hover:bg-slate-100 transition-all active:scale-95 group",
+                                        isExporting && "opacity-50 cursor-not-allowed"
+                                    )}
                                 >
-                                    <div className={`p-4 rounded-2xl ${option.color} group-hover:scale-110 transition-transform`}>
-                                        <option.icon size={24} />
+                                    <div className={cn(
+                                        "p-4 rounded-2xl transition-transform",
+                                        option.color,
+                                        !isExporting && "group-hover:scale-110"
+                                    )}>
+                                        {isExporting && exportType === option.id ? (
+                                            <Loader2 size={24} className="animate-spin" />
+                                        ) : (
+                                            <option.icon size={24} />
+                                        )}
                                     </div>
                                     <span className="text-sm font-black text-slate-700">{option.label}</span>
                                 </button>
                             ))}
                         </div>
-
-                        {/* Direct Share Button */}
-                        <Button className="w-full h-14 rounded-2xl text-lg font-black gap-2">
-                            <Share size={20} />
-                            시스템 공유창 열기
-                        </Button>
                     </motion.div>
                 </>
             )}
