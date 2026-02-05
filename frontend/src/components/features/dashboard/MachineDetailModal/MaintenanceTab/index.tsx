@@ -206,6 +206,7 @@ export function MaintenanceTab({
                                         type="datetime-local"
                                         value={visitDate}
                                         onChange={(e) => setVisitDate(e.target.value)}
+                                        max="9999-12-31T23:59"
                                         className="w-full p-4 rounded-2xl bg-slate-50 border border-slate-100 focus:outline-none focus:ring-2 focus:ring-signal-blue/20 focus:border-signal-blue text-sm font-bold text-slate-600"
                                     />
                                 </div>

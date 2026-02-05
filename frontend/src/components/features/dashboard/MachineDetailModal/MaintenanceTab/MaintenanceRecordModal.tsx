@@ -152,6 +152,7 @@ export function MaintenanceRecordModal({ isOpen, onClose, machineId, machineName
                                                 type="datetime-local"
                                                 value={performedAt}
                                                 onChange={(e) => setPerformedAt(e.target.value)}
+                                                max="9999-12-31T23:59"
                                                 className="w-full bg-slate-50 border border-slate-100 rounded-2xl py-4 pl-12 pr-4 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-signal-blue/20 focus:border-signal-blue transition-all"
                                                 required
                                             />
