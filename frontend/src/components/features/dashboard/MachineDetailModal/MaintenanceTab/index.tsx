@@ -1,10 +1,12 @@
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, History, Plus, CheckCircle2, Settings2, X, Clock, Loader2 } from 'lucide-react';
+import { AlertCircle, History, Plus, CheckCircle2, Settings2, X, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '../../../ui/Button';
-import { cn } from '../../../../lib/utils';
-import { type MaintenanceView } from './types';
-import { type Machine } from '../MachineCard';
+import { Button } from '../../../../ui/Button';
+import { cn } from '../../../../../lib/utils';
+import { type MaintenanceView } from '../types';
+import { type Machine } from '../../MachineCard';
+import { MaintenanceRecordModal } from './MaintenanceRecordModal';
 
 interface MaintenanceTabProps {
     machine: Machine;
@@ -33,6 +35,8 @@ export function MaintenanceTab({
     onSubmit,
     isSubmitting
 }: MaintenanceTabProps) {
+    const [isRecordModalOpen, setIsRecordModalOpen] = useState(false);
+
     const { data: history, isPending } = useQuery<any[]>({
         queryKey: ['maintenance-history', machine.id],
         queryFn: async () => {
@@ -41,6 +45,15 @@ export function MaintenanceTab({
             return response.json();
         },
     });
+
+    const getActionTypeLabel = (type: string) => {
+        switch (type) {
+            case 'CLEANING': return '청소/세척';
+            case 'CHECK': return '정기 점검';
+            case 'PART_REPLACE': return '부품 교체';
+            default: return type;
+        }
+    };
 
     return (
         <motion.div
@@ -59,7 +72,7 @@ export function MaintenanceTab({
                         exit={{ opacity: 0, y: -10 }}
                         className="space-y-8"
                     >
-                        {/* Smart Advice Card (Maintenance Context) */}
+                        {/* Smart Advice Card */}
                         <section>
                             <div className="p-6 rounded-[2.5rem] bg-amber-50 border border-amber-100 relative overflow-hidden">
                                 <div className="flex items-start gap-4">
@@ -87,7 +100,11 @@ export function MaintenanceTab({
                                     <History size={20} className="text-signal-blue" />
                                     최근 관리 이력
                                 </h3>
-                                <Button variant="secondary" className="h-10 px-4 rounded-xl text-xs gap-1.5 bg-slate-50 border-none">
+                                <Button
+                                    onClick={() => setIsRecordModalOpen(true)}
+                                    variant="secondary"
+                                    className="h-10 px-4 rounded-xl text-xs gap-1.5 bg-slate-50 border-none transition-all active:scale-95"
+                                >
                                     <Plus size={16} />
                                     기록 추가
                                 </Button>
@@ -101,21 +118,26 @@ export function MaintenanceTab({
                             ) : (
                                 <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-slate-100">
                                     {history && history.length > 0 ? history.map((log, i) => (
-                                        <div key={i} className="relative flex items-start gap-6 pl-2">
+                                        <div key={log.id || i} className="relative flex items-start gap-6 pl-2">
                                             <div className="mt-1.5 size-6 shrink-0 rounded-full border-4 border-white bg-signal-blue shadow-sm z-10" />
-                                            <div className="flex-1 p-5 rounded-[1.5rem] bg-white border border-slate-100 shadow-sm">
+                                            <div className="flex-1 p-5 rounded-[1.5rem] bg-white border border-slate-100 shadow-sm transition-all hover:shadow-md">
                                                 <div className="flex justify-between items-start mb-1">
                                                     <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">
                                                         {new Date(log.performed_at).toLocaleDateString()}
                                                     </span>
-                                                    <span className="text-[10px] px-2 py-0.5 bg-slate-50 text-slate-500 rounded-full font-bold">
-                                                        {log.action_type}
+                                                    <span className={cn(
+                                                        "text-[10px] px-2 py-0.5 rounded-full font-bold",
+                                                        log.action_type === 'CLEANING' ? "bg-blue-50 text-blue-500" :
+                                                            log.action_type === 'PART_REPLACE' ? "bg-emerald-500 text-white" :
+                                                                "bg-amber-500 text-white"
+                                                    )}>
+                                                        {getActionTypeLabel(log.action_type)}
                                                     </span>
                                                 </div>
-                                                <h4 className="text-[15px] font-black text-slate-800 mb-2">{log.description}</h4>
+                                                <h4 className="text-[15px] font-black text-slate-800 mb-2 leading-relaxed">{log.description}</h4>
                                                 <div className="flex items-center gap-1.5">
                                                     <CheckCircle2 size={14} className="text-emerald-500" />
-                                                    <span className="text-xs font-bold text-emerald-500">조회됨</span>
+                                                    <span className="text-xs font-bold text-emerald-500">정상 기록됨</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -126,11 +148,11 @@ export function MaintenanceTab({
                             )}
                         </section>
 
-                        {/* Call Technician (Service Ticket Bridge) */}
+                        {/* Call Technician */}
                         <section>
-                            <div className="p-6 rounded-[2rem] bg-slate-900 text-white flex items-center justify-between">
+                            <div className="p-6 rounded-[2rem] bg-slate-100 text-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4">
                                 <div className="flex items-center gap-4">
-                                    <div className="p-3 bg-white/10 rounded-2xl">
+                                    <div className="p-3 bg-white rounded-2xl shadow-sm">
                                         <Settings2 size={24} className="text-signal-blue" />
                                     </div>
                                     <div>
@@ -140,7 +162,7 @@ export function MaintenanceTab({
                                 </div>
                                 <Button
                                     onClick={() => setMaintenanceView('request')}
-                                    className="bg-signal-blue hover:bg-blue-600 rounded-xl px-5 h-12 font-black transition-all active:scale-95 shrink-0 whitespace-nowrap"
+                                    className="bg-slate-900 text-white hover:bg-black rounded-xl px-5 h-12 font-black transition-all active:scale-95 w-full sm:w-auto shrink-0 whitespace-nowrap"
                                 >
                                     호출하기
                                 </Button>
@@ -160,7 +182,7 @@ export function MaintenanceTab({
                                 onClick={() => setMaintenanceView('history')}
                                 className="p-2 -ml-2 text-slate-400 hover:text-slate-600"
                             >
-                                <X size={20} className="rotate-90" /> {/* Back icon hack */}
+                                <X size={20} className="rotate-90" />
                             </button>
                             <h3 className="text-xl font-black text-slate-900">서비스 신청서</h3>
                         </div>
@@ -220,7 +242,7 @@ export function MaintenanceTab({
                                     disabled={isSubmitting}
                                     className="w-full h-14 bg-signal-blue hover:bg-blue-600 text-white rounded-[1.5rem] font-black text-lg transition-all active:scale-95 shadow-xl shadow-blue-500/20 disabled:opacity-50"
                                 >
-                                    {isSubmitting ? <Loader2 className="animate-spin mr-2" /> : null}
+                                    {isSubmitting ? <Loader2 className="animate-spin mr-2" size={20} /> : null}
                                     {isSubmitting ? '신청 중...' : '서비스 신청하기'}
                                 </Button>
                                 <button
@@ -254,13 +276,19 @@ export function MaintenanceTab({
                             담당 기사님이 배정되는 대로<br />알림톡으로 안내해 드리겠습니다.
                         </p>
                         <div className="mt-8 flex items-center gap-2 text-sm font-bold text-slate-400 animate-pulse">
-                            <Clock size={16} />
+                            <History size={16} />
                             <span>곧 화면이 닫힙니다...</span>
                         </div>
                     </motion.div>
                 )}
             </AnimatePresence>
+
+            <MaintenanceRecordModal
+                isOpen={isRecordModalOpen}
+                onClose={() => setIsRecordModalOpen(false)}
+                machineId={machine.id}
+                machineName={machine.name}
+            />
         </motion.div>
     );
 }
-

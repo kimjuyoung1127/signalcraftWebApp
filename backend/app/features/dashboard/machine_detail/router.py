@@ -14,6 +14,12 @@ class ServiceTicketRequest(BaseModel):
     urgency: str = "normal"
     visit_date: Optional[str] = None
 
+class MaintenanceLogCreate(BaseModel):
+    device_id: str
+    action_type: str
+    description: str
+    performed_at: Optional[str] = None
+
 @router.get("/analysis")
 async def get_machine_analysis(machine_id: str):
     try:
@@ -78,6 +84,21 @@ async def create_service_ticket(ticket: ServiceTicketRequest):
         }
         
         response = supabase.table("service_tickets").insert(data).execute()
+        return response.data[0]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/maintenance")
+async def create_maintenance_log(log: MaintenanceLogCreate):
+    try:
+        data = {
+            "device_id": log.device_id,
+            "action_type": log.action_type,
+            "description": log.description,
+            "performed_at": log.performed_at if log.performed_at else None
+        }
+        
+        response = supabase.table("maintenance_logs").insert(data).execute()
         return response.data[0]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

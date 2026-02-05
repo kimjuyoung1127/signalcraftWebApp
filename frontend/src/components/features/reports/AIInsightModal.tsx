@@ -196,7 +196,7 @@ export function AIInsightModal({ isOpen, onClose }: AIInsightModalProps) {
 
                                     {/* AI Advice */}
                                     <section className="bg-gradient-to-br from-signal-blue to-indigo-600 rounded-[2rem] p-6 text-white relative overflow-hidden">
-                                        <Sparkles className="absolute top-4 right-4 text-white/20" size={48} />
+
                                         <div className="relative z-10">
                                             <div className="flex items-center gap-2 mb-3 opacity-90">
                                                 <Zap size={16} fill="currentColor" />

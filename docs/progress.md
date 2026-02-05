@@ -97,5 +97,16 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Clipboard Sharing**: `ShareModal`을 통한 간편한 리포트 링크 복사 및 토스트 알림 연동
 - [x] **Modern CSS Compatibility**: Tailwind v4의 `oklch` 색상 체계와 호환되는 캡처 엔진 구축
 
+## ✅ Phase 18: Cloud Deployment (Backend)
+- [x] **Render Deployment**: Python FastAPI 백엔드를 **Render** 플랫폼에 성공적으로 배포하여 24/7 가동 환경 구축
+- [x] **Environment Sync**: 브라우저 및 서버 환경변수(VITE_API_URL, SUPABASE_KEY 등) 동기화 완료
+- [x] **CORS Setting**: 프론트엔드(Vercel)와 백엔드(Render) 간의 안전한 데이터 통신 설정 적용
+
+## ✅ Phase 20: Maintenance Record & History Management
+- [x] **MaintenanceRecordModal**: `AIInsightModal` 스타일의 프리미엄 유지보수 기록 입력 모달 구현
+- [x] **RLS Policy Application**: Supabase `maintenance_logs` 테이블의 보안 정책(RLS) 설정 및 에러 해결
+- [x] **History Timeline**: 설비의 과거 점검/수리 내역을 타임라인 형태로 시각화하여 데이터 정합성 확보
+- [x] **Component Refactoring**: `MaintenanceTab`을 폴더 구조로 개편하여 유지보수성 및 확장성 강화
+
 ---
-*마지막 업데이트: 2026-02-05 (12:10 PM)*
+*마지막 업데이트: 2026-02-05 (03:55 PM)*
