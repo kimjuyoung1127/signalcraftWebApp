@@ -90,12 +90,13 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **Backend Bug Fix**: `dashboard/router.py` 내의 이름 오류(`NameError`) 및 임포트 누락 건 일괄 해결
 - [x] **Refined Interactivity**: 홈 버튼 클릭 시 애니메이션 효과(Scale Down) 추가로 프리미엄 UX 강화
 
-## 🚀 Future Roadmap (Pending)
-- [ ] **Live AI Analysis**: 주파수별 시멘틱 분석 및 Reasoning Log 고도화
-- [x] **Backend Logic Implementation**: Dashboard 및 Machine List 관련 Supabase 연동 및 API 구현 완료
-- [ ] **Dark Mode Support**: 눈이 편안한 저조도 환경을 위한 전역 다크 모드 테마 구현 (구현 예정)
-- [ ] **PWA Manifest**: 오프라인 모드 및 설치 가능한 앱 환경 구성
-- [ ] **Export Engine**: HACCP 표준 PDF/Excel 출력 엔진 (Digital Signature 포함)
+## ✅ Phase 16: Reports Supabase Integration & RLS (Latest)
+- [x] **Reports Backend API**: `daily_reports` 테이블 기반의 일간 리포트 및 최신 리포트 조회 API 구현
+- [x] **TanStack Query (Reports)**: 리포트 페이지의 모든 데이터를 `useQuery` 기반으로 전환하여 실시간성 확보
+- [x] **Device Selection**: 설비별 리포트를 동적으로 조회할 수 있는 선택 UI 구현
+- [x] **Status-based UI Logic**: `PASS`, `WARNING`, `DANGER` 상태에 따른 테마(초록/주황/빨강) 및 아이콘 자동 전환 로직 적용
+- [x] **Security (RLS)**: `daily_reports` 테이블에 대한 읽기 권한 정책을 추가하여 백엔드 데이터 접근성 해결
+- [x] **Debugging Mock Data**: 다양한 상태를 테스트하기 위한 최신 목업 데이터(정상/주의/위험) DB 시딩 완료
 
 ---
-*마지막 업데이트: 2026-02-04 (01:15 PM)*
+*마지막 업데이트: 2026-02-05 (10:45 AM)*

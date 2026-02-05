@@ -231,6 +231,10 @@ create table public.daily_reports (
   primary key (report_date, device_id)
 );
 
+-- RLS Policy for daily_reports
+ALTER TABLE public.daily_reports ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow all for reports debug" ON public.daily_reports FOR SELECT TO public USING (true);
+
 -- 4. Incidents
 create table public.incidents (
   id uuid default gen_random_uuid() primary key,

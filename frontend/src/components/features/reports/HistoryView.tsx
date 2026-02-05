@@ -1,19 +1,34 @@
+import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ChevronRight, Calendar, Search } from 'lucide-react';
+import { ChevronRight, Calendar, Search, Loader2 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
 interface HistoryViewProps {
+    deviceId: string | null;
     onSelectDate: (date: string) => void;
 }
 
-export function HistoryView({ onSelectDate }: HistoryViewProps) {
-    const reports = [
-        { date: '1월 30일', status: 'Optimal', health: 98, summary: '어제 가동 상태 완벽함' },
-        { date: '1월 29일', status: 'Warning', health: 82, summary: '필터 청소 주기 도래' },
-        { date: '1월 28일', status: 'Optimal', health: 95, summary: '안정적인 전력 소모' },
-        { date: '1월 27일', status: 'Optimal', health: 96, summary: '제상 주기 정상' },
-        { date: '1월 26일', status: 'Normal', health: 91, summary: '도어 개방 횟수 소폭 증가' },
-    ];
+interface DailyReport {
+    id: string;
+    report_date: string;
+    health_score: number;
+    ai_summary: string;
+    haccp_status: string;
+}
+
+export function HistoryView({ deviceId, onSelectDate }: HistoryViewProps) {
+    const { data: historyData, isLoading, error } = useQuery<{ reports: DailyReport[] }>({
+        queryKey: ['reports', 'history', deviceId],
+        queryFn: async () => {
+            if (!deviceId) return { reports: [] };
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/reports/?device_id=${deviceId}`);
+            if (!response.ok) throw new Error('히스토리 로드 실패');
+            return response.json();
+        },
+        enabled: !!deviceId,
+    });
+
+    const reports = historyData?.reports || [];
 
     return (
         <motion.div
@@ -34,30 +49,49 @@ export function HistoryView({ onSelectDate }: HistoryViewProps) {
 
             {/* List */}
             <div className="space-y-3">
-                {reports.map((report, i) => (
-                    <button
-                        key={i}
-                        onClick={() => onSelectDate(report.date)}
-                        className="w-full flex items-center justify-between p-5 rounded-[2rem] bg-white border border-slate-100 hover:border-signal-blue/30 hover:shadow-lg hover:shadow-slate-200/50 transition-all active:scale-[0.98] group text-left"
-                    >
-                        <div className="flex items-center gap-4">
-                            <div className={cn(
-                                "size-14 rounded-2xl flex flex-col items-center justify-center font-black",
-                                report.status === 'Optimal' ? "bg-emerald-50 text-emerald-600" :
-                                    report.status === 'Warning' ? "bg-amber-50 text-amber-600" :
-                                        "bg-blue-50 text-blue-600"
-                            )}>
-                                <span className="text-[10px] uppercase line-height-none mb-0.5">{report.health}%</span>
-                                <Calendar size={20} />
+                {isLoading ? (
+                    <div className="flex flex-col items-center justify-center py-12 gap-3 text-slate-400">
+                        <Loader2 className="size-8 animate-spin" />
+                        <p className="font-bold">기록을 불러오고 있습니다...</p>
+                    </div>
+                ) : error ? (
+                    <div className="p-6 text-center text-rose-500 font-bold bg-rose-50 rounded-2xl">
+                        불러오기 실패
+                    </div>
+                ) : reports.length === 0 ? (
+                    <div className="py-20 text-center bg-white rounded-[2rem] border border-dashed border-slate-200">
+                        <p className="font-bold text-slate-400">리포트 기록이 없습니다.</p>
+                    </div>
+                ) : (
+                    reports.map((report) => (
+                        <button
+                            key={report.id}
+                            onClick={() => onSelectDate(report.report_date)}
+                            className="w-full flex items-center justify-between p-5 rounded-[2rem] bg-white border border-slate-100 hover:border-signal-blue/30 hover:shadow-lg hover:shadow-slate-200/50 transition-all active:scale-[0.98] group text-left"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className={cn(
+                                    "size-14 rounded-2xl flex flex-col items-center justify-center font-black",
+                                    report.haccp_status === 'PASS'
+                                        ? "bg-emerald-50 text-emerald-600"
+                                        : report.haccp_status === 'WARNING'
+                                            ? "bg-amber-50 text-amber-600"
+                                            : "bg-rose-50 text-rose-600"
+                                )}>
+                                    <span className="text-[10px] uppercase line-height-none mb-0.5">{report.health_score}%</span>
+                                    <Calendar size={20} />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-black text-slate-900 leading-tight">
+                                        {new Date(report.report_date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })} 리포트
+                                    </h4>
+                                    <p className="text-xs text-slate-400 font-bold mt-1 line-clamp-1">{report.ai_summary}</p>
+                                </div>
                             </div>
-                            <div>
-                                <h4 className="font-black text-slate-900 leading-tight">{report.date} 리포트</h4>
-                                <p className="text-xs text-slate-400 font-bold mt-1">{report.summary}</p>
-                            </div>
-                        </div>
-                        <ChevronRight size={20} className="text-slate-300 group-hover:text-signal-blue transition-colors" />
-                    </button>
-                ))}
+                            <ChevronRight size={20} className="text-slate-300 group-hover:text-signal-blue transition-colors" />
+                        </button>
+                    ))
+                )}
             </div>
         </motion.div>
     );

@@ -3,7 +3,7 @@ import { Badge } from '../../ui/Badge';
 interface StatRowProps {
     label: string;
     value: string;
-    status: 'Normal' | 'Optimal' | 'Alert';
+    status: 'Normal' | 'Optimal' | 'Alert' | 'Warning';
     progress: number;
     color?: string;
     subtext?: string;
