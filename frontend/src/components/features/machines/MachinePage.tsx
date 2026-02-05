@@ -60,7 +60,7 @@ export function MachinePage() {
             <main className="flex-1 overflow-y-auto">
                 <div className="sticky top-0 z-30 bg-slate-50/95 backdrop-blur-sm pt-2 pb-2 transition-all">
                     {/* Search Bar */}
-                    <div className="px-6 py-2">
+                    <div className="px-4 sm:px-6 py-2">
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                             <input
@@ -74,7 +74,7 @@ export function MachinePage() {
                     </div>
 
                     {/* Filters & View Toggle */}
-                    <div className="flex items-center justify-between px-6 pb-2">
+                    <div className="flex items-center justify-between px-4 sm:px-6 pb-2">
                         <MachineFilters currentFilter={filter} onFilterChange={setFilter} />
                         <div className="flex p-1 bg-slate-200/50 rounded-xl">
                             <button

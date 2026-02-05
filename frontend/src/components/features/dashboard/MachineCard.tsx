@@ -48,7 +48,7 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
             whileHover={{ y: -4, transition: { duration: 0.2 } }}
             whileTap={{ scale: 0.98 }}
             transition={{ delay: index * 0.1, type: "spring", stiffness: 100, damping: 20 }}
-            className="px-4 py-2 cursor-pointer relative"
+            className="px-2 sm:px-4 py-2 cursor-pointer relative"
         >
             <Card
                 className="p-0 overflow-hidden border-none shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.06)] transition-all duration-500 group relative"
@@ -57,23 +57,23 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                 {/* Background Sparkle Effect on Hover */}
                 <div className="absolute inset-0 bg-gradient-to-tr from-signal-blue/0 via-signal-blue/[0.02] to-signal-blue/0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-                <div className="p-6 flex gap-6 relative z-10">
+                <div className="p-4 sm:p-6 flex gap-4 sm:gap-6 relative z-10">
                     <motion.div
                         whileHover={{ scale: 1.1, rotate: -2 }}
-                        className="w-24 h-24 shrink-0 bg-slate-100 rounded-[1.5rem] bg-center bg-cover border border-slate-50 overflow-hidden shadow-sm"
+                        className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-slate-100 rounded-[1.25rem] sm:rounded-[1.5rem] bg-center bg-cover border border-slate-50 overflow-hidden shadow-sm"
                         style={{ backgroundImage: `url(${machine.imageUrl})` }}
                     />
 
-                    <div className="flex flex-col flex-1">
+                    <div className="flex flex-col flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-2">
                             <div>
                                 <motion.h4
                                     layout
-                                    className="text-[17px] font-black text-slate-900 leading-tight tracking-tight mb-0.5 group-hover:text-signal-blue transition-colors"
+                                    className="text-[16px] sm:text-[17px] font-black text-slate-900 leading-tight tracking-tight mb-0.5 group-hover:text-signal-blue transition-colors truncate"
                                 >
                                     {machine.name}
                                 </motion.h4>
-                                <p className="text-[13px] text-slate-400 font-bold tracking-tight">
+                                <p className="text-[12px] sm:text-[13px] text-slate-400 font-bold tracking-tight truncate">
                                     {machine.location}
                                 </p>
                             </div>
@@ -126,7 +126,7 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-2.5 mt-auto">
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 mt-auto">
                             <motion.div
                                 animate={machine.status === 'running' ? {
                                     scale: [1, 1.05, 1],
@@ -162,7 +162,7 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                     initial={false}
                     animate={{ backgroundColor: machine.status === 'warning' ? "rgba(239, 68, 68, 0.05)" : "rgba(248, 250, 252, 0.5)" }}
                     className={cn(
-                        "px-6 py-4 flex items-center gap-3 transition-all border-t border-slate-50",
+                        "px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 transition-all border-t border-slate-50",
                         machine.status === 'warning' ? "text-signal-red" : "text-slate-600"
                     )}
                 >
