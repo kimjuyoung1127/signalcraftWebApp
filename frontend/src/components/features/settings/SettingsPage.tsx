@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Bell, Lock, HelpCircle, FileText, LogOut, Moon } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import { BottomNav } from '../../shared/BottomNav';
 import { ProfileCard } from './ProfileCard';
 import { SettingsGroup } from './SettingsGroup';
 import { SettingsItem } from './SettingsItem';
+import { Header } from '../../shared/Header';
 
 const containerVariants: Variants = {
     hidden: { opacity: 0 },
@@ -25,11 +27,84 @@ const itemVariants: Variants = {
     }
 };
 
-import { Header } from '../../shared/Header';
+interface NotificationSettings {
+    push_enabled: boolean;
+    kakao_enabled: boolean;
+    anomaly_alerts: boolean;
+    report_alerts: boolean;
+    push_token?: string;
+}
 
 export function SettingsPage() {
-    const [notifications, setNotifications] = useState(true);
+    const queryClient = useQueryClient();
     const [darkMode, setDarkMode] = useState(false);
+
+    // Fetch settings
+    const { data: settings, isLoading } = useQuery<NotificationSettings>({
+        queryKey: ['settings', 'notifications'],
+        queryFn: async () => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications/settings`);
+            if (!response.ok) throw new Error('알림 설정 로드 실패');
+            return response.json();
+        }
+    });
+
+    // Update settings mutation
+    const updateSettingsMutation = useMutation({
+        mutationFn: async (newSettings: Partial<NotificationSettings>) => {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/notifications/settings`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newSettings),
+            });
+            if (!response.ok) throw new Error('설정 저장 실패');
+            return response.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['settings', 'notifications'] });
+        }
+    });
+
+    const handleToggle = (key: keyof NotificationSettings) => {
+        if (!settings) return;
+
+        const newValue = !settings[key];
+
+        // Optimistic update logic could go here if needed, 
+        // but for now we'll just fire the mutation
+        updateSettingsMutation.mutate({ [key]: newValue });
+
+        // If enabling push, request permission
+        if (key === 'push_enabled' && newValue) {
+            requestNotificationPermission();
+        }
+    };
+
+    const requestNotificationPermission = async () => {
+        if (!('Notification' in window)) return;
+
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+            console.log('Notification permission granted.');
+            // Here we would normally get the FCM token and save it
+            // generateFCMToken(); 
+        }
+    };
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col min-h-screen pb-24 bg-slate-50">
+                <Header />
+                <div className="flex-1 flex items-center justify-center">
+                    <div className="animate-pulse flex flex-col items-center gap-4">
+                        <div className="size-12 bg-slate-200 rounded-full"></div>
+                        <div className="w-32 h-4 bg-slate-200 rounded-lg"></div>
+                    </div>
+                </div>
+                <BottomNav />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col min-h-screen pb-24 bg-slate-50">
@@ -50,14 +125,45 @@ export function SettingsPage() {
                 </motion.section>
 
                 <motion.div variants={itemVariants}>
-                    <SettingsGroup title="앱 설정">
+                    <SettingsGroup title="알림 채널">
                         <SettingsItem
                             icon={<Bell size={20} />}
-                            title="알림 설정"
+                            title="앱 푸시 알림"
                             type="toggle"
-                            isToggled={notifications}
-                            onToggle={() => setNotifications(!notifications)}
+                            isToggled={settings?.push_enabled}
+                            onToggle={() => handleToggle('push_enabled')}
                         />
+                        <SettingsItem
+                            icon={<div className="size-5 bg-[#FEE500] rounded-lg flex items-center justify-center text-[10px] font-bold text-[#3C1E1E]">K</div>}
+                            title="카카오톡 알림"
+                            type="toggle"
+                            isToggled={settings?.kakao_enabled}
+                            onToggle={() => handleToggle('kakao_enabled')}
+                        />
+                    </SettingsGroup>
+                </motion.div>
+
+                {(settings?.push_enabled || settings?.kakao_enabled) && (
+                    <motion.div variants={itemVariants}>
+                        <SettingsGroup title="알림 상세 설정">
+                            <SettingsItem
+                                title="이상 징후 즉시 알림"
+                                type="toggle"
+                                isToggled={settings?.anomaly_alerts}
+                                onToggle={() => handleToggle('anomaly_alerts')}
+                            />
+                            <SettingsItem
+                                title="일간/주간 AI 리포트"
+                                type="toggle"
+                                isToggled={settings?.report_alerts}
+                                onToggle={() => handleToggle('report_alerts')}
+                            />
+                        </SettingsGroup>
+                    </motion.div>
+                )}
+
+                <motion.div variants={itemVariants}>
+                    <SettingsGroup title="앱 설정">
                         <SettingsItem
                             icon={<Moon size={20} />}
                             title="다크 모드"

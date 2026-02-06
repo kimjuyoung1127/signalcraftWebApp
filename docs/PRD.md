@@ -76,7 +76,7 @@
 
 ### 3.4 알림 및 제어 (Notification & Control)
 
-* **이상 징후 알림:** 백엔드(FastAPI)에서 판단 즉시 FCM으로 푸시 발송.
+* **알림 채널 및 상세 설정**: 사용자가 앱 푸시 및 카카오톡 알림을 선택적으로 활성화하고, 이상 징후나 AI 리포트 중 원하는 알림만 골라서 받을 수 있는 상세 설정 UI 제공.
 * **피드백 루프:** 사용자가 "오탐지(무시하기)" 버튼을 누르면, 해당 시점의 특징값을 `False Positive`로 분류하여 Otsu 민감도(Multiplier)를 자동으로 0.1 단위 둔감화.
 
 ### 3.5 정밀 진단 및 고장 예보 (Advanced Diagnostics & Prediction)
@@ -148,6 +148,7 @@
 | **Phase 3** | **Frontend (MVP)** | React PWA 구축, 대시보드/리포트 UI 구현, FCM 연동 | 2주 |
 | **Phase 4** | **Test & Tuning** | 실환경 테스트, 자동 임계값 튜닝 검증, "학습 모드" UX 개선 | 1주 |
 | **Phase 5** | **Advanced UX** | 다크 모드(Dark Mode) 지원 및 테마 최적화 | 1주 |
+| **Phase 6** | **Notifications** | 알림 상세 설정 UI, 백엔드 API, DB 스키마 구축 | 현재 |
 
 ---
 

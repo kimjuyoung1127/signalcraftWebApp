@@ -25,6 +25,7 @@ erDiagram
     devices ||--o{ maintenance_logs : records
     devices ||--o{ machine_event_logs : tracks
     devices ||--|| forecasts : predicts
+    users ||--|| notification_settings : configures
 ```
 
 ---
@@ -179,6 +180,20 @@ HACCP 법적 증빙을 위한 상세 이벤트 타임라인입니다.
 | `golden_time` | `timestamptz` | 고장 임계치 도달 예상 시점 | 카운트다운용 |
 | `updated_at` | `timestamptz` | 모델 갱신 시각 | |
 
+#### `notification_settings` (알림 설정)
+사용자의 푸시 알림 및 리포트 수신 환경설정을 관리합니다.
+
+| Column | Type | Description | Note |
+| :--- | :--- | :--- | :--- |
+| `id` | `uuid` (PK) | 설정 ID | `gen_random_uuid()` |
+| `user_id` | `uuid` (FK) | 사용자 ID (`auth.users`) | Unique, RLS 기준 |
+| `push_token` | `text` | 최신 FCM 푸시 토큰 | |
+| `push_enabled` | `bool` | 앱 푸시 활성화 여부 | Default: True |
+| `kakao_enabled`| `bool` | 카카오톡 알림 사용 여부 | Default: False |
+| `anomaly_alerts`| `bool` | 이상 징후 즉시 알림 설정 | Default: True |
+| `report_alerts` | `bool` | AI 리포트 알림 설정 | Default: True |
+| `updated_at` | `timestamptz` | 마지막 수정 시각 | |
+
 ---
 
 ## 4. Initialization SQL
@@ -255,4 +270,22 @@ create table public.maintenance_logs (
   performed_at timestamptz default now(),
   images text[]
 );
+
+-- 6. Notification Settings
+create table public.notification_settings (
+    id uuid default gen_random_uuid() primary key,
+    user_id uuid references auth.users(id) on delete cascade unique,
+    push_token text,
+    push_enabled boolean default true,
+    kakao_enabled boolean default false,
+    anomaly_alerts boolean default true,
+    report_alerts boolean default true,
+    updated_at timestamptz default now(),
+    created_at timestamptz default now()
+);
+
+-- RLS for Notification Settings
+alter table public.notification_settings enable row level security;
+create policy "Users can manage their own notification settings" 
+on public.notification_settings for all to public using (true); -- Debug mode
 ```

@@ -108,5 +108,12 @@ SignalCraft Biz 프로젝트의 기회 단계부터 프론트엔드 구현, 품�
 - [x] **History Timeline**: 설비의 과거 점검/수리 내역을 타임라인 형태로 시각화하여 데이터 정합성 확보
 - [x] **Component Refactoring**: `MaintenanceTab`을 폴더 구조로 개편하여 유지보수성 및 확장성 강화
 
+## ✅ Phase 21: Notification System & Preferences
+- [x] **Granular Notification UI**: `SettingsPage` 내에 앱 푸시, 카카오톡, 이상 징후, 리포트 알림 개별 토글 구현
+- [x] **Backend Settings API**: 알림 설정 조회를 위한 `GET` 및 저장을 위한 `POST` (Upsert) 엔드포인트 구축
+- [x] **Database Schema Expansion**: 유저별 알림 환경설정 및 FCM 토큰 저장을 위한 `notification_settings` 테이블 생성
+- [x] **Server State Synchronization**: TanStack Query를 도입하여 설정 변경 시 실시간 DB 연동 및 캐시 관리
+- [x] **Permission Flow**: PWA 환경에서의 브라우저 알림 권한 요청 및 상태 시각화
+
 ---
-*마지막 업데이트: 2026-02-05 (03:55 PM)*
+*마지막 업데이트: 2026-02-06 (09:59 AM)*
