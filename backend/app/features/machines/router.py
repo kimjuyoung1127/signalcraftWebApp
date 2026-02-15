@@ -14,20 +14,34 @@ async def list_machines():
         response = supabase.table("devices").select("*").eq("user_id", user_id).execute()
         machines = []
         
+        status_map = {
+            "GOOD": "running",
+            "WARNING": "warning",
+            "DANGER": "danger"
+        }
+
         for d in response.data:
-            # Map DB status to frontend status
-            status_map = {
-                "GOOD": "running",
-                "WARNING": "warning",
-                "DANGER": "danger"
-            }
-            
+            # Fetch latest health_score from daily_reports
+            report_res = supabase.table("daily_reports")\
+                .select("health_score")\
+                .eq("device_id", str(d["id"]))\
+                .order("report_date", desc=True)\
+                .limit(1)\
+                .execute()
+            real_health = report_res.data[0]["health_score"] if report_res.data else (
+                100 if d["status"] == "GOOD" else (70 if d["status"] == "WARNING" else 40)
+            )
+
+            location = "A구역"
+            if d["location_info"] and isinstance(d["location_info"], dict):
+                location = d["location_info"].get("address", "A구역")
+
             machines.append({
                 "id": str(d["id"]),
                 "name": d["name"],
-                "location": "A구역" if d["location_info"] is None else d["location_info"].get("address", "A구역"),
+                "location": location,
                 "status": status_map.get(d["status"], "running"),
-                "health": 100 if d["status"] == "GOOD" else (70 if d["status"] == "WARNING" else 40),
+                "health": real_health,
                 "prediction": d["config"].get("prediction", "AI 예측 진행 중") if d["config"] else "AI 예측 진행 중",
                 "imageUrl": f"https://placehold.co/200x200?text={d['name']}",
                 "type": d["model_type"].lower() if d["model_type"] else "freezer"

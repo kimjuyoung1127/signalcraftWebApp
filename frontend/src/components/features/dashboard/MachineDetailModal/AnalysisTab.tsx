@@ -361,7 +361,7 @@ export function AnalysisTab({ machine, onViewMaintenance }: AnalysisTabProps) {
                             <span className="text-2xl font-black text-slate-900">{roi.watt || 0}</span>
                             <span className="text-sm font-bold text-slate-400">kWh</span>
                         </div>
-                        <p className="text-xs font-bold text-emerald-500">전주 대비 {Math.floor(Math.random() * 10 + 5)}% 절감 중</p>
+                        <p className="text-xs font-bold text-emerald-500">전주 대비 {Math.round((roi.saved || 8000) / 1200)}% 절감 중</p>
                     </div>
 
                     {/* Acoustic Door Guard */}

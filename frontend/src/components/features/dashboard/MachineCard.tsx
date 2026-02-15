@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MoreHorizontal, Brain, Zap, AlertTriangle, CalendarClock, Trash2, Settings2 } from 'lucide-react';
+import { MoreHorizontal, Brain, Zap, AlertTriangle, CalendarClock, Trash2, Settings2, Snowflake, Thermometer, Wind, Box } from 'lucide-react';
 import { Card } from '../../ui/Card';
 import { Badge } from '../../ui/Badge';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -41,6 +41,15 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
 
     const PredictionIcon = machine.status === 'warning' ? AlertTriangle : machine.id.includes('2') ? CalendarClock : Brain;
 
+    const getMachineIcon = (type: string) => {
+        const t = type?.toUpperCase() || '';
+        if (t.includes('FREEZER') || t.includes('BLAST')) return <Snowflake className="size-9 sm:size-10 text-blue-500" />;
+        if (t.includes('REFRIGERATOR')) return <Thermometer className="size-9 sm:size-10 text-cyan-500" />;
+        if (t.includes('SHOWCASE')) return <Wind className="size-9 sm:size-10 text-indigo-500" />;
+        if (t.includes('COLD') || t.includes('STORAGE')) return <Box className="size-9 sm:size-10 text-slate-500" />;
+        return <Snowflake className="size-9 sm:size-10 text-blue-500" />;
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -60,9 +69,10 @@ export function MachineCard({ machine, index, onClick, onManage, onDelete }: Mac
                 <div className="p-4 sm:p-6 flex gap-4 sm:gap-6 relative z-10">
                     <motion.div
                         whileHover={{ scale: 1.1, rotate: -2 }}
-                        className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-slate-100 rounded-[1.25rem] sm:rounded-[1.5rem] bg-center bg-cover border border-slate-50 overflow-hidden shadow-sm"
-                        style={{ backgroundImage: `url(${machine.imageUrl})` }}
-                    />
+                        className="w-20 h-20 sm:w-24 sm:h-24 shrink-0 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-[1.25rem] sm:rounded-[1.5rem] border border-blue-100/50 overflow-hidden shadow-sm flex items-center justify-center"
+                    >
+                        {getMachineIcon(machine.type)}
+                    </motion.div>
 
                     <div className="flex flex-col flex-1 min-w-0">
                         <div className="flex justify-between items-start mb-2">

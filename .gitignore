@@ -25,6 +25,7 @@ backend/*.pyc
 .agent/skills/react-vite-best-practices/
 .gemini/
 mcp_config.json
+.mcp.json
 
 # Design
 design/*.html.tmp
