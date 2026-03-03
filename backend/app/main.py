@@ -38,3 +38,18 @@ async def root():
         "status": "online",
         "version": settings.VERSION
     }
+
+@app.get("/debug/env")
+async def debug_env():
+    import os
+    return {
+        "supabase_url_from_settings": settings.SUPABASE_URL,
+        "supabase_url_from_os": os.environ.get("SUPABASE_URL", "NOT_FOUND"),
+        "supabase_key_length": len(settings.SUPABASE_KEY) if settings.SUPABASE_KEY else 0
+    }
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port)
