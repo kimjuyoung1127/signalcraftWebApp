@@ -1,74 +1,48 @@
-# 🚀 Deployment Roadmap: Vercel (Frontend)
+# 🚀 Deployment Roadmap
 
-This document guides you through setting up **Continuous Deployment (CD)** for the SignalCraft Biz frontend using **Vercel**.
+This document guides you through setting up **Continuous Deployment (CD)** for the SignalCraft Biz application.
+The application uses a split deployment model:
+- **Frontend**: Vercel
+- **Backend**: Railway
 
 ## 🎯 Objective
-- **Automated Deployment:** Every time code is pushed to the `main` branch on GitHub, the live website automatically updates.
-- **Team Access:** Provide a public URL (e.g., `signalcraft-app.vercel.app`) for team members to view progress.
+- **Automated Deployment:** Every time code is pushed to the `main` branch on GitHub, both the frontend and backend automatically update.
 
 ---
 
-## ✅ Prerequisites
+## 🚂 Backend Deployment (Railway)
 
-1.  **GitHub Repository:** Ensure your project is pushed to GitHub.
-2.  **Vercel Account:** Sign up at [vercel.com](https://vercel.com) (Log in with GitHub recommended).
+We use Railway to reliably host our FastAPI Python backend using Nixpacks.
 
----
-
-## 🛠 Step-by-Step Setup Guide
-
-### 1. Connect Vercel to GitHub
-1.  Login to your **Vercel Dashboard**.
-2.  Click **"Add New..."** -> **"Project"**.
-3.  In the "Import Git Repository" section, you should see your GitHub account.
-    *   *If not, click "Add GitHub Org or Account" to authorize.*
-4.  Find **`signalcraftapp`** (or your repo name) and click **"Import"**.
-
-### 2. Configure Project (Framework Preset)
-Vercel usually auto-detects everything, but double-check:
-
-*   **Framework Preset:** `Vite` (It should detect this automatically).
-*   **Root Directory:** `frontend`
-    *   ⚠️ **Important:** Since your actual code is inside the `frontend` folder, you MUST click "Edit" next to Root Directory and select the `frontend` folder.
-*   **Build Command:** `npm run build` (default).
-*   **Output Directory:** `dist` (default).
-
-### 3. Environment Variables (Optional)
-If you have `.env` variables (like Supabase keys), add them here:
-*   Click **"Environment Variables"**.
-*   Add keys like `VITE_SUPABASE_URL` and their values.
-
-### 4. Deploy
-*   Click **"Deploy"**.
-*   Vercel will install dependencies, build the project, and assign a domain.
-*   Wait for the celebration confetti! 🎉
+### Setup Guide
+1. Create an account on [Railway.app](https://railway.app).
+2. Click **New Project** -> **Deploy from GitHub repo** and select `signalcraftWebApp`.
+3. Railway will automatically detect the `railway.toml` file in the root directory and configure the build for the `backend/` folder.
+4. Go to the newly created service's **Settings** -> **Variables** and add your environment variables (e.g., `DATABASE_URL`, `CORS_ORIGINS`).
+5. Go to **Networking** and click **Generate Domain**.
+6. Copy this domain (e.g., `https://signalcraft-production.up.railway.app`) to use as the `VITE_API_URL` in the frontend setup.
 
 ---
 
-## 🔄 How to Update
-From now on, you **do not** need to do anything on Vercel.
-1.  Edit code in VS Code.
-2.  Commit and Push to GitHub.
-    ```bash
-    git add .
-    git commit -m "Update dashboard design"
-    git push origin main
-    ```
-3.  Vercel detects the push and **automatically redeploys** within 1-2 minutes.
+## ⚡ Frontend Deployment (Vercel)
 
----
+### Setup Guide
+1. Login to your **Vercel Dashboard**.
+2. Click **"Add New..."** -> **"Project"** and import `signalcraftWebApp`.
+3. Configure the Project:
+   - **Framework Preset:** `Vite`
+   - **Root Directory:** Edit and select `frontend`.
+4. Environment Variables:
+   - Key: `VITE_API_URL`
+   - Value: The Railway domain generated in the previous step.
+5. Click **Deploy**.
 
-## 🔧 Troubleshooting
-
-### "404 Not Found" on Page Refresh
-Since this is a Single Page App (SPA), refreshing a sub-page (e.g., `/report`) might cause a 404 error if not configured.
+### 🔧 Troubleshooting Frontend (Vercel)
+**"404 Not Found" on Page Refresh**
+Since this is a Single Page App (SPA), refreshing a sub-page might cause a 404 error.
 *   **Solution:** Create a `vercel.json` file in the `frontend` folder with the following content:
     ```json
     {
       "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
     }
     ```
-
-### Build Fails
-*   Check the "Logs" tab in Vercel.
-*   Common error: TypeScript strict mode. Ensure `npm run build` passes on your local machine first.

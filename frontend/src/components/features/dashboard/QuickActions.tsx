@@ -75,8 +75,8 @@ export function QuickActions() {
                                 onClick={action.onClick}
                                 disabled={action.isLoading}
                                 className={`flex items-center gap-2.5 rounded-2xl h-14 px-6 shadow-sm border transition-all active:scale-95 flex ${action.isActive
-                                        ? 'bg-blue-50 border-blue-100 text-slate-900 shadow-blue-50/50'
-                                        : 'bg-white border-slate-100 text-slate-400'
+                                    ? 'bg-blue-50 border-blue-100 text-slate-900 shadow-blue-50/50'
+                                    : 'bg-white border-slate-100 text-slate-400'
                                     }`}
                             >
                                 <Icon className={`${action.color} ${action.isLoading ? 'animate-spin' : ''}`} size={18} />
